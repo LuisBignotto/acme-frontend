@@ -20,6 +20,7 @@ api.interceptors.request.use(config => {
 
 export const login = async (email: string, password: string): Promise<LoginResponse> => {
   try {
+    localStorage.removeItem('authToken');
     const response = await api.post<LoginResponse>('/login', { email, password });
     return response.data;
   } catch (error) {

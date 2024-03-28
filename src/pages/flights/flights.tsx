@@ -72,8 +72,8 @@ export function FlightsPage() {
 
     if (loading) {
         return (
-            <div className="flex-grow overflow-auto py-12 px-12">
-                <LoaderCircle className="animate-spin" />
+            <div className="flex items-center justify-center h-full flex-grow overflow-auto py-12 px-12">
+                <LoaderCircle size={64} className="animate-spin text-darkblue" />
             </div>
         );
     }
