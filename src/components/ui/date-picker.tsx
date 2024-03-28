@@ -32,7 +32,7 @@ export function DatePickerDemo({ selected, onSelect }: DatePickerDemoProps) {
         <Calendar
           mode="single"
           selected={date}
-          onSelect={(date: Date | undefined) => {
+          onSelect={(date?: Date) => {
             if(date){
               setDate(date);
               onSelect(date);
