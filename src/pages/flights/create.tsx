@@ -1,32 +1,28 @@
 import { FormEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { CreateFlightFormState } from "@/interfaces/CreateFlightFormState";
 import { createFlight } from "@/services/api";
-import { DatePickerDemo } from "@/components/ui/date-picker";
-import { format } from "date-fns";
+import FormField from "./components/form-field";
 
 const fieldLabels: { [K in keyof Omit<CreateFlightFormState, 'isValid'>]: string } = {
-    flightNumber: "Número do Voo",
     departureAirport: "Aeroporto de Partida",
     departureDate: "Data de Partida",
-    departureTime: "Hora de Partida",
+    departureTime: "Horário de Partida",
     arrivalAirport: "Aeroporto de Chegada",
     arrivalDate: "Data de Chegada",
-    arrivalTime: "Hora de Chegada",
+    arrivalTime: "Horário de Chegada",
 };
 
 export function CreateFlightForm() {
     const [state, setState] = useState<CreateFlightFormState>({
-        flightNumber: "",
+        departureAirport: "",
         departureDate: "",
         departureTime: "",
+        arrivalAirport: "",
         arrivalDate: "",
         arrivalTime: "",
-        departureAirport: "",
-        arrivalAirport: "",
         isValid: true,
     });
 
@@ -52,7 +48,7 @@ export function CreateFlightForm() {
 
     return (
         <div className="h-full flex items-center justify-center px-4">
-            <Card className="w-full max-w-lg">
+            <Card className="w-full max-w-xl">
                 <form onSubmit={handleSubmit}>
                     <CardHeader>
                         <CardTitle className="text-2xl">Criar Novo Voo</CardTitle>
@@ -65,25 +61,17 @@ export function CreateFlightForm() {
                             {(Object.keys(fieldLabels) as (keyof Omit<CreateFlightFormState, 'isValid'>)[]).map((field) => (
                                 <div key={field} className="grid gap-2">
                                     <Label htmlFor={field}>{fieldLabels[field]}</Label>
-                                    {field === 'departureDate' || field === 'arrivalDate' ? (
-                                        <DatePickerDemo
-                                            selected={state[field] ? new Date(state[field]) : undefined}
-                                            onSelect={(date) => handleChange(field, format(date, "yyyy-MM-dd"))}
-                                        />
-                                    ) : (
-                                        <Input
-                                            id={field}
-                                            type="text"
-                                            state={state.isValid ? "default" : "error"}
-                                            onFocus={() => setState({ ...state, isValid: true })}
-                                            required
-                                            value={state[field]}
-                                            onChange={(e) => handleChange(field, e.target.value)}
-                                        />
-                                    )}
+                                    <FormField
+                                        field={field}
+                                        value={state[field]}
+                                        onChange={(value) => handleChange(field, value)}
+                                        type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : field === 'departureTime' || field === 'arrivalTime' ? 'time' : 'text'}
+                                        placeholder={fieldLabels[field]}
+                                        placeholderHour={field.includes('departure') ? 'Selecione a hora de partida' : 'Selecione a hora de chegada'}
+                                        placeholderMinute={field.includes('departure') ? 'Selecione o minuto de partida' : 'Selecione o minuto de chegada'}
+                                    />
                                 </div>
                             ))}
-
                             <Button type="submit" className="w-full">
                                 Criar Voo
                             </Button>
