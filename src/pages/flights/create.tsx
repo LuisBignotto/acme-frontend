@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import { CreateFlightFormState } from "@/interfaces/CreateFlightFormState";
-import { createFlight } from "@/services/api";
+import { createFlight } from "@/services/flights-service/flightsService";
 import FormField from "./components/form-field";
 
 const fieldLabels: { [K in keyof Omit<CreateFlightFormState, 'isValid'>]: string } = {

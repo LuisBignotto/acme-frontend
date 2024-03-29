@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteFlight, getFlights } from "@/services/api";
+import { deleteFlight, getFlights } from "@/services/flights-service/flightsService";
 import { Flight, FlightsResponse } from "@/interfaces/FlightInterfaces";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
