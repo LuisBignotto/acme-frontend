@@ -1,19 +1,21 @@
 import { useEffect, useState } from "react";
 import { deleteFlight, getFlights } from "@/services/flights-service/flightsService";
-import { Flight, FlightsResponse } from "@/interfaces/FlightInterfaces";
+import { Flight } from "@/interfaces/FlightInterfaces";
 import { Button } from "@/components/ui/button";
 import { Link } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
 import FlightTable from "./components/flight-table";
 import PaginationComponent from "@/components/pagination/pagination-comp";
+import { FlightsResponse } from "@/interfaces/FlightsResponse";
+import { useToast } from "@/components/ui/use-toast";
 
 
 export function FlightsPage() {
     const [flights, setFlights] = useState<Flight[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
-    const [error, setError] = useState<string>('');
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
+    const { toast } = useToast()
 
     const fetchFlights = async () => {
         setLoading(true);
@@ -22,9 +24,12 @@ export function FlightsPage() {
             setFlights(data.content);
             setTotalPages(data.totalPages);
             setCurrentPage(data.number);
-            setError('');
         } catch (error) {
-            setError('Ocorreu um erro ao buscar os voos.');
+            toast({
+                variant: "destructive",
+                title: "Falha ao buscar voos!",
+                description: "Entre novamente para ver voos.",
+            })
         } finally {
             setLoading(false);
         }
@@ -38,8 +43,16 @@ export function FlightsPage() {
         try {
             await deleteFlight(id);
             await fetchFlights();
+            toast({
+                variant: "success",
+                title: "Voo apagado com sucesso!",
+            })
         } catch (error) {
-            setError('Ocorreu um erro ao deletar o voo.');
+            toast({
+                variant: "destructive",
+                title: "Erro ao deletar voo!",
+                description: "Ainda há bagagens nesse voo.",
+            })
         }
     };
 
@@ -53,10 +66,6 @@ export function FlightsPage() {
                 <LoaderCircle size={64} className="animate-spin text-darkblue" />
             </div>
         );
-    }
-
-    if (error) {
-        return <div>{error}</div>;
     }
 
     return (

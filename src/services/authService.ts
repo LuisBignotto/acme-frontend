@@ -1,5 +1,14 @@
 import api from './api';
 
+export const isAuthenticated = (): boolean => {
+    return !!localStorage.getItem('authToken');
+};
+
+export const logout = (): void => {
+    localStorage.removeItem('authToken');
+};
+
+
 api.interceptors.request.use(config => {
     const token = localStorage.getItem('authToken');
     if (token) {

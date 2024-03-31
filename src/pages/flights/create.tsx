@@ -1,10 +1,10 @@
-import { FormEvent, useState } from "react";
+import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
+import FormField from "./components/form-field";
 import { CreateFlightFormState } from "@/interfaces/CreateFlightFormState";
 import { createFlight } from "@/services/flights-service/flightsService";
-import FormField from "./components/form-field";
 
 const fieldLabels: { [K in keyof Omit<CreateFlightFormState, 'isValid'>]: string } = {
     departureAirport: "Aeroporto de Partida",
@@ -30,11 +30,17 @@ export function CreateFlightForm() {
         setState({ ...state, [field]: value });
     };
 
+    const handleTimeChange = (field: keyof CreateFlightFormState, timePart: "hour" | "minute", value: string) => {
+        const currentTime = state[field] || "00:00";
+        const [hour, minute] = currentTime.split(":");
+        const newTime = timePart === "hour" ? `${value}:${minute}` : `${hour}:${value}`;
+        handleChange(field, newTime);
+    };
+
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (state.isValid) {
-            console.log(state)
             createFlight(state)
                 .then(() => {
                     alert("Voo criado com sucesso!");
@@ -61,15 +67,36 @@ export function CreateFlightForm() {
                             {(Object.keys(fieldLabels) as (keyof Omit<CreateFlightFormState, 'isValid'>)[]).map((field) => (
                                 <div key={field} className="grid gap-2">
                                     <Label htmlFor={field}>{fieldLabels[field]}</Label>
-                                    <FormField
-                                        field={field}
-                                        value={state[field]}
-                                        onChange={(value) => handleChange(field, value)}
-                                        type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : field === 'departureTime' || field === 'arrivalTime' ? 'time' : 'text'}
-                                        placeholder={fieldLabels[field]}
-                                        placeholderHour={field.includes('departure') ? 'Selecione a hora de partida' : 'Selecione a hora de chegada'}
-                                        placeholderMinute={field.includes('departure') ? 'Selecione o minuto de partida' : 'Selecione o minuto de chegada'}
-                                    />
+                                    {field.includes("Time") ? (
+                                        <div className="flex space-x-2">
+                                            <FormField
+                                                field={`${field}Hour`}
+                                                value={state[field]?.split(":")[0] || ""}
+                                                onChange={(value) => handleTimeChange(field, "hour", value)}
+                                                type="time"
+                                                placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                                placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                                placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
+                                            />
+                                            <FormField
+                                                field={`${field}Minute`}
+                                                value={state[field]?.split(":")[1] || ""}
+                                                onChange={(value) => handleTimeChange(field, "minute", value)}
+                                                type="time"
+                                                placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                                placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                                placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
+                                            />
+                                        </div>
+                                    ) : (
+                                        <FormField
+                                            field={field}
+                                            value={state[field]}
+                                            onChange={(value) => handleChange(field, value)}
+                                            type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : 'text'}
+                                            placeholder={fieldLabels[field]}
+                                        />
+                                    )}
                                 </div>
                             ))}
                             <Button type="submit" className="w-full">

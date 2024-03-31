@@ -14,9 +14,7 @@ export const getFlights = async (page = 0, size = 10, sort = 'id') => {
 export const deleteFlight = async (flightId: string) => {
     try {
         await api.delete(`/flights/${flightId}`);
-        console.log(`Voo com ID: ${flightId} foi deletado com sucesso.`);
     } catch (error) {
-        console.error('Erro ao deletar o voo:', error);
         throw error;
     }
 };

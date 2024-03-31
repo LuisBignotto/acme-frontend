@@ -5,7 +5,7 @@ import { ptBR } from 'date-fns/locale';
 import { Flight } from "@/interfaces/FlightInterfaces";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 
 interface FlightTableProps {
     flights: Flight[];
@@ -46,6 +46,7 @@ const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
                                         <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
                                         <AlertDialogDescription>Tem certeza de que deseja excluir este voo?</AlertDialogDescription>
                                         <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                             <AlertDialogAction onClick={() => onDelete(flight.id)}>Confirmar</AlertDialogAction>
                                         </AlertDialogFooter>
                                     </AlertDialogContent>
