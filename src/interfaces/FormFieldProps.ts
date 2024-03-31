@@ -1,11 +1,9 @@
-import { CreateFlightFormState } from "./CreateFlightFormState";
-
 export interface FormFieldProps {
-    field: keyof CreateFlightFormState;
+    field: string;
     value: string;
-    onChange: (field: keyof CreateFlightFormState, value: string) => void;
-    type: 'text' | 'date' | 'time';
+    onChange: (value: string) => void;
+    type: 'text' | 'date' | 'minute' | 'hour';
     placeholder: string;
-    placeholderHour?: string;
-    placeholderMinute?: string;
+    placeholderHour: string;
+    placeholderMinute: string;
 }

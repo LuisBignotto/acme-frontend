@@ -5,6 +5,8 @@ import { Label } from "@/components/ui/label";
 import FormField from "./components/form-field";
 import { CreateFlightFormState } from "@/interfaces/CreateFlightFormState";
 import { createFlight } from "@/services/flights-service/flightsService";
+import { toast } from "@/components/ui/use-toast";
+import { useNavigate } from 'react-router-dom';
 
 const fieldLabels: { [K in keyof Omit<CreateFlightFormState, 'isValid'>]: string } = {
     departureAirport: "Aeroporto de Partida",
@@ -15,7 +17,9 @@ const fieldLabels: { [K in keyof Omit<CreateFlightFormState, 'isValid'>]: string
     arrivalTime: "Horário de Chegada",
 };
 
+
 export function CreateFlightForm() {
+
     const [state, setState] = useState<CreateFlightFormState>({
         departureAirport: "",
         departureDate: "",
@@ -26,31 +30,60 @@ export function CreateFlightForm() {
         isValid: true,
     });
 
+    const navigate = useNavigate();
+
     const handleChange = (field: keyof CreateFlightFormState, value: string) => {
         setState({ ...state, [field]: value });
     };
 
     const handleTimeChange = (field: keyof CreateFlightFormState, timePart: "hour" | "minute", value: string) => {
-        const currentTime = state[field] || "00:00";
+        let currentTime = state[field] || "00:00";
+        currentTime = currentTime as string;
         const [hour, minute] = currentTime.split(":");
         const newTime = timePart === "hour" ? `${value}:${minute}` : `${hour}:${value}`;
         handleChange(field, newTime);
     };
 
-    const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
         if (state.isValid) {
-            createFlight(state)
+            const departureDateTime = `${state.departureDate}T${state.departureTime}:00`;
+            const arrivalDateTime = `${state.arrivalDate}T${state.arrivalTime}:00`;
+
+            const departureAirportCode = state.departureAirport.substring(0, 3).toUpperCase();
+            const arrivalAirportCode = state.arrivalAirport.substring(0, 3).toUpperCase();
+            const randomNumber = Math.floor(Math.random() * 1000);
+            const flightNumber = `${departureAirportCode}${randomNumber}${arrivalAirportCode}`;
+
+            const flightData = {
+                flightNumber: flightNumber,
+                departureDate: departureDateTime,
+                arrivalDate: arrivalDateTime,
+                departureAirport: state.departureAirport,
+                arrivalAirport: state.arrivalAirport,
+            };
+
+            await createFlight(flightData)
                 .then(() => {
-                    alert("Voo criado com sucesso!");
+                    toast({
+                        variant: "success",
+                        title: "Voo criado com sucesso!",
+                    })
+                    navigate('/flights');
                 })
-                .catch((e) => {
-                    console.error("Erro ao criar o voo:", e);
+                .catch(() => {
+                    toast({
+                        variant: "destructive",
+                        title: "Erro ao criar voo!",
+                    })
                     setState({ ...state, isValid: false });
                 });
         }
     };
+
+
 
     return (
         <div className="h-full flex items-center justify-center px-4">
@@ -73,7 +106,7 @@ export function CreateFlightForm() {
                                                 field={`${field}Hour`}
                                                 value={state[field]?.split(":")[0] || ""}
                                                 onChange={(value) => handleTimeChange(field, "hour", value)}
-                                                type="time"
+                                                type="hour"
                                                 placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
                                                 placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
                                                 placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
@@ -82,7 +115,7 @@ export function CreateFlightForm() {
                                                 field={`${field}Minute`}
                                                 value={state[field]?.split(":")[1] || ""}
                                                 onChange={(value) => handleTimeChange(field, "minute", value)}
-                                                type="time"
+                                                type="minute"
                                                 placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
                                                 placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
                                                 placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
@@ -95,6 +128,8 @@ export function CreateFlightForm() {
                                             onChange={(value) => handleChange(field, value)}
                                             type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : 'text'}
                                             placeholder={fieldLabels[field]}
+                                            placeholderHour={""}
+                                            placeholderMinute={""}
                                         />
                                     )}
                                 </div>

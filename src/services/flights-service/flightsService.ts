@@ -1,12 +1,11 @@
-import { CreateFlightFormState } from '@/interfaces/CreateFlightFormState';
 import api from '../api';
+import { flightData } from '@/interfaces/flightData';
 
 export const getFlights = async (page = 0, size = 10, sort = 'id') => {
     try {
         const response = await api.get(`/flights?page=${page}&size=${size}&sort=${sort}`);
         return response.data;
     } catch (error) {
-        console.error('Erro ao buscar os voos:', error);
         throw error;
     }
 };
@@ -19,23 +18,11 @@ export const deleteFlight = async (flightId: string) => {
     }
 };
 
-export const createFlight = async (flightData: CreateFlightFormState) => {
+export const createFlight = async (flightData: flightData) => {
     try {
-        const departureAirportCode = flightData.departureAirport.substring(0, 3).toUpperCase();
-        const arrivalAirportCode = flightData.arrivalAirport.substring(0, 3).toUpperCase();
-        const randomNumber = Math.floor(Math.random() * 1000);
-        const flightNumber = `${departureAirportCode}${randomNumber}${arrivalAirportCode}`;
-
-        await api.post('/flights/create', {
-            flightNumber: flightNumber,
-            departureDate: flightData.departureDate,
-            arrivalDate: flightData.arrivalDate,
-            departureAirport: flightData.departureAirport,
-            arrivalAirport: flightData.arrivalAirport,
-        });
-        console.log("Voo criado com sucesso.");
+        await api.post('/flights/create', flightData);
     } catch (error) {
-        console.error("Erro ao criar o voo:", error);
         throw error;
     }
 };
+
