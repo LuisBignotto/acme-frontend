@@ -1,6 +1,6 @@
 import React from 'react';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { SelectProps } from '@/interfaces/SelectProps';
+import { SelectProps } from '@/interfaces/flight-interfaces/SelectProps';
 
 const SelectMinute: React.FC<SelectProps> = ({ value, onChange, placeholder }) => {
     const minutes = ['00', '15', '30', '45'];

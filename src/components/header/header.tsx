@@ -1,6 +1,8 @@
 import * as React from "react";
 import { Button } from "../ui/button";
 import { Link, NavLink } from "react-router-dom";
+import { CircleUserRound } from "lucide-react";
+import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface HeaderProps {
   userLoggedIn: boolean;
@@ -12,24 +14,29 @@ const Header: React.FC<HeaderProps> = ({ userLoggedIn }) => {
       <Link to="../">
         ACME
       </Link>
-      { userLoggedIn ? (
-          <nav aria-label="Menu de navegacao" className="flex items-center justify-between gap-2 md:gap-6">
-            <NavLink to="../flights">
-              Voos
-            </NavLink>
-            <NavLink to="../baggages">
-              Bagagens
-            </NavLink>
-            <NavLink to="../users">
-              Usuários
-            </NavLink>
-          </nav>
-        ) : (<></>) 
+      {userLoggedIn ? (
+        <nav aria-label="Menu de navegacao" className="flex items-center justify-between gap-2 md:gap-6">
+          <NavLink to="../flights">
+            Voos
+          </NavLink>
+          <NavLink to="../baggages">
+            Bagagens
+          </NavLink>
+          <NavLink to="../users">
+            Usuários
+          </NavLink>
+        </nav>
+      ) : (<></>)
       }
 
       {userLoggedIn ? (
         <Link to="../">
-          <Button>Perfil</Button>
+          <Avatar>
+            <AvatarImage src="https://github.com/shadcn.png" />
+            <AvatarFallback>
+              <CircleUserRound size={50}/>
+            </AvatarFallback>
+          </Avatar>
         </Link>
       ) : (
         <Link to="../">

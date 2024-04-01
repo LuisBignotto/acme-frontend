@@ -4,7 +4,7 @@ import { DatePickerDemo } from "@/components/ui/date-picker";
 import SelectMinute from "./select-minute";
 import { format } from "date-fns";
 import SelectHour from './select-hour';
-import { FormFieldProps } from '@/interfaces/FormFieldProps';
+import { FormFieldProps } from '@/interfaces/flight-interfaces/FormFieldProps';
 
 const FormField: React.FC<FormFieldProps> = ({ field, value, onChange, type, placeholder, placeholderHour, placeholderMinute }) => {
     switch (type) {

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import FormField from "./components/form-field";
-import { CreateFlightFormState } from "@/interfaces/CreateFlightFormState";
+import { CreateFlightFormState } from "@/interfaces/flight-interfaces/CreateFlightFormState";
 import { createFlight } from "@/services/flights-service/flightsService";
 import { toast } from "@/components/ui/use-toast";
 import { useNavigate } from 'react-router-dom';
@@ -16,7 +16,6 @@ const fieldLabels: { [K in keyof Omit<CreateFlightFormState, 'isValid'>]: string
     arrivalDate: "Data de Chegada",
     arrivalTime: "Horário de Chegada",
 };
-
 
 export function CreateFlightForm() {
 

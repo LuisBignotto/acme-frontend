@@ -4,6 +4,7 @@ import { LoginForm } from '../pages/login/login';
 import { FlightsPage } from '@/pages/flights/flights';
 import { CreateFlightForm } from '@/pages/flights/create';
 import ProtectedRoute from './ProtectedRoute';
+import { FlightPage } from '@/pages/flights/flight';
 
 const router = createBrowserRouter([
  {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: '/flights/create',
         element: <ProtectedRoute element={<CreateFlightForm />} redirectTo="/" />
+      },
+      {
+        path: '/flights/:flightId',
+        element: <ProtectedRoute element={<FlightPage />} redirectTo="/" />
       }
     ]
  }

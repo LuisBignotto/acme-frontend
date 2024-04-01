@@ -2,15 +2,10 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { format, parseISO } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
-import { Flight } from "@/interfaces/FlightInterfaces";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-
-interface FlightTableProps {
-    flights: Flight[];
-    onDelete: (id: string) => void;
-}
+import { FlightTableProps } from '@/interfaces/flight-interfaces/FlightTableProps';
 
 const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
     return (
@@ -36,6 +31,9 @@ const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
                         <TableCell className="px-4 py-2 flex space-x-2">
                             <Link to={`/flights/${flight.id}`}>
                                 <Button>Ver Bagagens</Button>
+                            </Link>
+                            <Link to={`/flights/${flight.id}`}>
+                                <Button>Editar</Button>
                             </Link>
                             <div>
                                 <AlertDialog>
