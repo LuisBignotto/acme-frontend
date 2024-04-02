@@ -1,4 +1,4 @@
-export interface CreateFlightFormState {
+export interface FlightFormState {
     departureAirport: string;
     departureDate: string;
     departureTime: string;

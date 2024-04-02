@@ -35,3 +35,10 @@ export const createFlight = async (flightData: flightData) => {
     }
 };
 
+export const updateFlight = async (flightId: string, flightData: any) => {
+    try {
+        await api.put(`/flights/${flightId}`, flightData);
+    } catch (error) {
+        throw error;
+    }
+};

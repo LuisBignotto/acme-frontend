@@ -32,7 +32,7 @@ const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
                             <Link to={`/flights/${flight.id}`}>
                                 <Button>Ver Bagagens</Button>
                             </Link>
-                            <Link to={`/flights/${flight.id}`}>
+                            <Link to={`/flights/update/${flight.id}`}>
                                 <Button>Editar</Button>
                             </Link>
                             <div>

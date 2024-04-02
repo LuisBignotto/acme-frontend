@@ -5,6 +5,7 @@ import { FlightsPage } from '@/pages/flights/flights';
 import { CreateFlightForm } from '@/pages/flights/create';
 import ProtectedRoute from './ProtectedRoute';
 import { FlightPage } from '@/pages/flights/flight';
+import { UpdateFlightForm } from '@/pages/flights/update';
 
 const router = createBrowserRouter([
  {
@@ -26,6 +27,11 @@ const router = createBrowserRouter([
       {
         path: '/flights/:flightId',
         element: <ProtectedRoute element={<FlightPage />} redirectTo="/" />
+      }
+      ,
+      {
+        path: '/flights/update/:flightId',
+        element: <ProtectedRoute element={<UpdateFlightForm />} redirectTo="/" />
       }
     ]
  }

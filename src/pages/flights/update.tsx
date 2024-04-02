@@ -1,12 +1,12 @@
-import { useState, FormEvent } from "react";
+import { useState, FormEvent, useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import FormField from "./components/form-field";
 import { FlightFormState } from "@/interfaces/flight-interfaces/FlightFormState";
-import { createFlight } from "@/services/flights-service/flightsService";
+import { getFlight, updateFlight } from "@/services/flights-service/flightsService";
 import { toast } from "@/components/ui/use-toast";
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useParams } from 'react-router-dom';
 
 const fieldLabels: { [K in keyof Omit<FlightFormState, 'isValid'>]: string } = {
     departureAirport: "Aeroporto de Partida",
@@ -17,8 +17,7 @@ const fieldLabels: { [K in keyof Omit<FlightFormState, 'isValid'>]: string } = {
     arrivalTime: "Horário de Chegada",
 };
 
-export function CreateFlightForm() {
-
+export function UpdateFlightForm() {
     const [state, setState] = useState<FlightFormState>({
         departureAirport: "",
         departureDate: "",
@@ -28,6 +27,38 @@ export function CreateFlightForm() {
         arrivalTime: "",
         isValid: true,
     });
+
+    const { flightId } = useParams<{ flightId: string }>();
+
+    useEffect(() => {
+        const fetchFlight = async () => {
+            try {
+                if (!flightId) {
+                    throw new Error("ID do voo não especificado.");
+                }
+                const response = await getFlight(flightId);
+                const flightData = response.data; 
+                setState({
+                    departureAirport: flightData.departureAirport,
+                    departureDate: flightData.departureDate.split('T')[0],
+                    departureTime: flightData.departureDate.split('T')[1].split(':')[0] + ':' + flightData.departureDate.split('T')[1].split(':')[1], 
+                    arrivalAirport: flightData.arrivalAirport,
+                    arrivalDate: flightData.arrivalDate.split('T')[0],
+                    arrivalTime: flightData.arrivalDate.split('T')[1].split(':')[0] + ':' + flightData.arrivalDate.split('T')[1].split(':')[1],
+                    isValid: true,
+                });
+            } catch (error) {
+                toast({
+                    variant: "destructive",
+                    title: "Falha ao buscar os detalhes do voo!",
+                    description: "Entre novamente para editar o voo.",
+                });
+            }
+        };
+    
+        fetchFlight();
+    }, [flightId]);
+    
 
     const navigate = useNavigate();
 
@@ -43,39 +74,32 @@ export function CreateFlightForm() {
         handleChange(field, newTime);
     };
 
-
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
 
-        if (state.isValid) {
+        if (state.isValid && flightId) {
             const departureDateTime = `${state.departureDate}T${state.departureTime}:00`;
             const arrivalDateTime = `${state.arrivalDate}T${state.arrivalTime}:00`;
 
-            const departureAirportCode = state.departureAirport.substring(0, 3).toUpperCase();
-            const arrivalAirportCode = state.arrivalAirport.substring(0, 3).toUpperCase();
-            const randomNumber = Math.floor(Math.random() * 1000);
-            const flightNumber = `${departureAirportCode}${randomNumber}${arrivalAirportCode}`;
-
             const flightData = {
-                flightNumber: flightNumber,
                 departureDate: departureDateTime,
                 arrivalDate: arrivalDateTime,
                 departureAirport: state.departureAirport,
                 arrivalAirport: state.arrivalAirport,
             };
 
-            await createFlight(flightData)
+            await updateFlight(flightId, flightData)
                 .then(() => {
                     toast({
                         variant: "success",
-                        title: "Voo criado com sucesso!",
+                        title: "Voo editado com sucesso!",
                     })
                     navigate('/flights');
                 })
                 .catch(() => {
                     toast({
                         variant: "destructive",
-                        title: "Erro ao criar voo!",
+                        title: "Erro ao editar voo!",
                     })
                     setState({ ...state, isValid: false });
                 });
@@ -83,13 +107,12 @@ export function CreateFlightForm() {
     };
 
 
-
     return (
         <div className="h-full flex items-center justify-center px-4">
             <Card className="w-full max-w-xl">
                 <form onSubmit={handleSubmit}>
                     <CardHeader>
-                        <CardTitle className="text-2xl">Criar Novo Voo</CardTitle>
+                        <CardTitle className="text-2xl">Editar Voo</CardTitle>
                         <CardDescription>
                             Preencha as informações do voo.
                         </CardDescription>
@@ -119,11 +142,12 @@ export function CreateFlightForm() {
                                                 placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
                                                 placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
                                             />
+
                                         </div>
                                     ) : (
                                         <FormField
                                             field={field}
-                                            value={state[field]}
+                                            value={state[field] || ""}
                                             onChange={(value) => handleChange(field, value)}
                                             type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : 'text'}
                                             placeholder={fieldLabels[field]}
@@ -134,7 +158,7 @@ export function CreateFlightForm() {
                                 </div>
                             ))}
                             <Button type="submit" className="w-full">
-                                Criar Voo
+                                Salvar
                             </Button>
                         </div>
                     </CardContent>

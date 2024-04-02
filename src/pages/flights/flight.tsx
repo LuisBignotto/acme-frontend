@@ -1,10 +1,11 @@
 import { useEffect, useState } from "react";
-import { useParams } from 'react-router-dom'; 
+import { Link, useParams } from 'react-router-dom'; 
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getFlight } from "@/services/flights-service/flightsService";
 import { Bagages } from "@/interfaces/flight-interfaces/Bagages";
 import BagageTable from "./components/baggage-table"; 
+import { Button } from "@/components/ui/button";
 
 export function FlightPage() {
     const [loading, setLoading] = useState<boolean>(true);
@@ -49,6 +50,11 @@ export function FlightPage() {
 
     return (
         <div className="flex-grow overflow-auto py-12 px-12">
+            <div className="mb-4">
+                <Link to="../baggages/create">
+                    <Button>Adicionar Bagagem</Button>
+                </Link>
+            </div>
             <BagageTable bagages={baggages} onDelete={(id: string) => console.log(`Bagagem ${id} deletada`)} />
         </div>
     );
