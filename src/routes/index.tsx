@@ -27,8 +27,7 @@ const router = createBrowserRouter([
       {
         path: '/flights/:flightId',
         element: <ProtectedRoute element={<FlightPage />} redirectTo="/" />
-      }
-      ,
+      },
       {
         path: '/flights/update/:flightId',
         element: <ProtectedRoute element={<UpdateFlightForm />} redirectTo="/" />

@@ -2,7 +2,7 @@ import React from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { BagageTableProps } from '@/interfaces/flight-interfaces/BagageTableProps';
+import { BagageTableProps } from '@/interfaces/baggage-interfaces/BagageTableProps';
 
 const BagageTable: React.FC<BagageTableProps> = ({ bagages, onDelete }) => {
     return (

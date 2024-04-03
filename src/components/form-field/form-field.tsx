@@ -1,9 +1,9 @@
 import React from 'react';
 import { Input } from "@/components/ui/input";
 import { DatePickerDemo } from "@/components/ui/date-picker";
-import SelectMinute from "./select-minute";
+import SelectMinute from "../../pages/flights/components/select-minute";
 import { format } from "date-fns";
-import SelectHour from './select-hour';
+import SelectHour from '../../pages/flights/components/select-hour';
 import { FormFieldProps } from '@/interfaces/flight-interfaces/FormFieldProps';
 
 const FormField: React.FC<FormFieldProps> = ({ field, value, onChange, type, placeholder, placeholderHour, placeholderMinute }) => {

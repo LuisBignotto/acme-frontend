@@ -1,17 +1,46 @@
-import { useEffect, useState } from "react";
-import { Link, useParams } from 'react-router-dom'; 
+import { FormEvent, useEffect, useState } from "react";
+import { useParams } from 'react-router-dom';
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getFlight } from "@/services/flights-service/flightsService";
-import { Bagages } from "@/interfaces/flight-interfaces/Bagages";
-import BagageTable from "./components/baggage-table"; 
+import { createBagage } from "@/services/baggage-service/baggageService";
+import { Bagages } from "@/interfaces/baggage-interfaces/Bagages";
+import BagageTable from "../baggages/components/baggage-table";
 import { Button } from "@/components/ui/button";
+import SelectStatus from '../baggages/components/select-status';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { BagageFormState } from "@/interfaces/baggage-interfaces/BagageFormState";
+import { Label } from "@/components/ui/label";
+import FormField from "@/components/form-field/form-field";
+
+const fieldLabels: { [K in keyof Omit<BagageFormState, 'isValid' | 'tag' | 'flightId'>]: string } = {
+    userEmail: "User Email",
+    color: "Cor",
+    weight: "Peso",
+    status: "Status",
+    lastSeenLocation: "Última Localização",
+};
+
+const statusOptions = [
+    { value: "DESPACHADA", label: "DESPACHADA" },
+];
 
 export function FlightPage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [baggages, setBaggages] = useState<Bagages[]>([]);
-    const { toast } = useToast()
+    const [isOpen, setIsOpen] = useState(false);
+    const [state, setState] = useState<BagageFormState>({
+        userEmail: "",
+        tag: "",
+        color: "",
+        weight: "",
+        status: "",
+        lastSeenLocation: "",
+        flightId: "",
+        isValid: true,
+    });
     const { flightId } = useParams<{ flightId: string }>();
+    const { toast } = useToast()
 
     const fetchFlight = async () => {
         setLoading(true);
@@ -19,8 +48,8 @@ export function FlightPage() {
             if (!flightId) {
                 throw new Error("ID do voo não especificado.");
             }
-            const data: Bagages[] = await getFlight(flightId); 
-            setBaggages(data);
+            const data = await getFlight(flightId);
+            setBaggages(data.baggage);
         } catch (error) {
             toast({
                 variant: "destructive",
@@ -35,6 +64,53 @@ export function FlightPage() {
     useEffect(() => {
         fetchFlight();
     }, [flightId]);
+
+    const handleChange = (field: keyof Omit<BagageFormState, 'tag' | 'flightId'>, value: string) => {
+        setState({ ...state, [field]: value });
+    };
+
+    const generateTag = (): string => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let tag = '';
+        for (let i = 0; i < 6; i++) {
+            tag += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return tag;
+    };
+
+    const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+
+        if (state.isValid && flightId) {
+            const tag = generateTag();
+            const bagageData = {
+                userEmail: state.userEmail,
+                tag,
+                color: state.color,
+                weight: parseFloat(state.weight),
+                status: state.status,
+                lastSeenLocation: state.lastSeenLocation,
+                flightId,
+            };
+
+            await createBagage(bagageData)
+                .then((newBagage) => {
+                    toast({
+                        variant: "success",
+                        title: "Bagagem criada com sucesso!",
+                    });
+                    setBaggages([...baggages, newBagage]);
+                    setIsOpen(false);
+                })
+                .catch(() => {
+                    toast({
+                        variant: "destructive",
+                        title: "Erro ao criar bagagem!",
+                    });
+                    setState({ ...state, isValid: false });
+                });
+        }
+    };
 
     if (loading) {
         return (
@@ -51,9 +127,46 @@ export function FlightPage() {
     return (
         <div className="flex-grow overflow-auto py-12 px-12">
             <div className="mb-4">
-                <Link to="../baggages/create">
-                    <Button>Adicionar Bagagem</Button>
-                </Link>
+                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                    <DialogTrigger asChild>
+                        <Button>Adicionar Bagagem</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Criar Nova Bagagem</DialogTitle>
+                        </DialogHeader>
+                        <form onSubmit={handleSubmit}>
+                            <div className="grid gap-4">
+                                {(Object.keys(fieldLabels) as (keyof Omit<BagageFormState, 'isValid' | 'tag' | 'flightId'>)[]).map((field) => (
+                                    <div key={field} className="grid gap-2">
+                                        <Label htmlFor={field}>{fieldLabels[field]}</Label>
+                                        {field === 'status' ? (
+                                            <SelectStatus
+                                                options={statusOptions}
+                                                value={state[field] || ""}
+                                                onChange={(value) => handleChange(field, value)}
+                                                placeholder="Selecione o status"
+                                            />
+                                        ) : (
+                                            <FormField
+                                                field={field}
+                                                value={state[field]}
+                                                onChange={(value) => handleChange(field, value)}
+                                                type={'text'}
+                                                placeholder={fieldLabels[field]}
+                                                placeholderHour={""}
+                                                placeholderMinute={""}
+                                            />
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                            <DialogFooter>
+                                <Button type="submit" className="mt-4">Criar Bagagem</Button>
+                            </DialogFooter>
+                        </form>
+                    </DialogContent>
+                </Dialog>
             </div>
             <BagageTable bagages={baggages} onDelete={(id: string) => console.log(`Bagagem ${id} deletada`)} />
         </div>
