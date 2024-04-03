@@ -3,7 +3,7 @@ import { useParams } from 'react-router-dom';
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getFlight } from "@/services/flights-service/flightsService";
-import { createBagage } from "@/services/baggage-service/baggageService";
+import { createBaggage, deleteBaggage } from "@/services/baggage-service/baggageService";
 import { Bagages } from "@/interfaces/baggage-interfaces/Bagages";
 import BagageTable from "../baggages/components/baggage-table";
 import { Button } from "@/components/ui/button";
@@ -83,7 +83,7 @@ export function FlightPage() {
 
         if (state.isValid && flightId) {
             const tag = generateTag();
-            const bagageData = {
+            const baggageData = {
                 userEmail: state.userEmail,
                 tag,
                 color: state.color,
@@ -93,13 +93,13 @@ export function FlightPage() {
                 flightId,
             };
 
-            await createBagage(bagageData)
-                .then((newBagage) => {
+            await createBaggage(baggageData)
+                .then((newBaggage) => {
                     toast({
                         variant: "success",
                         title: "Bagagem criada com sucesso!",
                     });
-                    setBaggages([...baggages, newBagage]);
+                    setBaggages([...baggages, newBaggage]);
                     setIsOpen(false);
                 })
                 .catch(() => {
@@ -109,6 +109,22 @@ export function FlightPage() {
                     });
                     setState({ ...state, isValid: false });
                 });
+        }
+    };
+
+    const handleDeleteBaggage = async (id: string) => {
+        try {
+            await deleteBaggage(id);
+            await fetchFlight();
+            toast({
+                variant: "success",
+                title: "Bagagem apagada com sucesso!",
+            })
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Erro ao apagar bagagem!",
+            })
         }
     };
 
@@ -168,7 +184,7 @@ export function FlightPage() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <BagageTable bagages={baggages} onDelete={(id: string) => console.log(`Bagagem ${id} deletada`)} />
+            <BagageTable bagages={baggages} onDelete={handleDeleteBaggage} />
         </div>
     );
 }
