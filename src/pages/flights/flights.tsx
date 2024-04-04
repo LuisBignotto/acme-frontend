@@ -2,14 +2,13 @@ import { useEffect, useState } from "react";
 import { deleteFlight, getFlights } from "@/services/flights-service/flightsService";
 import { Flight } from "@/interfaces/flight-interfaces/FlightInterfaces";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { LoaderCircle } from "lucide-react";
 import FlightTable from "./components/flight-table";
 import PaginationComponent from "@/components/pagination/pagination-comp";
 import { FlightsResponse } from "@/interfaces/flight-interfaces/FlightsResponse";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { CreateFlightForm } from "./create";
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { CreateFlightForm } from "./components/create";
 
 
 export function FlightsPage() {

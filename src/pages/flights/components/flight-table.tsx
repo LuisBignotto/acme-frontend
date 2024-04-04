@@ -6,8 +6,21 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { FlightTableProps } from '@/interfaces/flight-interfaces/FlightTableProps';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { UpdateFlightForm } from '../update';
 
 const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
+    const [selectedFlightId, setSelectedFlightId] = React.useState<string | null>(null);
+
+    const openEditDialog = (flightId: string) => {
+        setSelectedFlightId(flightId);
+    };
+
+    const closeEditDialog = () => {
+        setSelectedFlightId(null);
+    };
+
+
     return (
         <Table className="rounded-lg overflow-hidden min-w-screen-md shadow-lg">
             <TableHeader className="bg-gray-100">
@@ -32,9 +45,7 @@ const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
                             <Link to={`/flights/${flight.id}`}>
                                 <Button>Ver Bagagens</Button>
                             </Link>
-                            <Link to={`/flights/update/${flight.id}`}>
-                                <Button>Editar</Button>
-                            </Link>
+                            <Button onClick={() => openEditDialog(flight.id)}>Editar</Button>
                             <div>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
@@ -53,6 +64,16 @@ const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
                         </TableCell>
                     </TableRow>
                 ))}
+                {selectedFlightId && (
+                    <Dialog open={true} onOpenChange={closeEditDialog}>
+                        <DialogContent>
+                            <DialogHeader>
+                                <DialogTitle>Editar Voo</DialogTitle>
+                            </DialogHeader>
+                            <UpdateFlightForm flightId={selectedFlightId} onClose={closeEditDialog} />
+                        </DialogContent>
+                    </Dialog>
+                )}
             </TableBody>
         </Table>
     );

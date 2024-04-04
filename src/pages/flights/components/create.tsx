@@ -1,7 +1,7 @@
 import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import FormField from "../../components/form-field/form-field";
+import FormField from "../../../components/form-field/form-field";
 import { FlightFormState } from "@/interfaces/flight-interfaces/FlightFormState";
 import { createFlight } from "@/services/flights-service/flightsService";
 import { toast } from "@/components/ui/use-toast";
