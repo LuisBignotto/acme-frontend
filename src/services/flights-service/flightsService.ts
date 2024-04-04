@@ -1,9 +1,9 @@
 import api from '../api';
 import { flightData } from '@/interfaces/flight-interfaces/flightData';
 
-export const getFlights = async (page = 0, size = 10, sort = 'id') => {
+export const getFlights = async (page = 0, size = 10) => {
     try {
-        const response = await api.get(`/flights?page=${page}&size=${size}&sort=${sort}`);
+        const response = await api.get(`/flights?page=${page}&size=${size}&sort=departureDate`);
         return response.data;
     } catch (error) {
         throw error;

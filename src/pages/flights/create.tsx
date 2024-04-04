@@ -1,12 +1,10 @@
 import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Label } from "@/components/ui/label";
 import FormField from "../../components/form-field/form-field";
 import { FlightFormState } from "@/interfaces/flight-interfaces/FlightFormState";
 import { createFlight } from "@/services/flights-service/flightsService";
 import { toast } from "@/components/ui/use-toast";
-import { useNavigate } from 'react-router-dom';
 
 const fieldLabels: { [K in keyof Omit<FlightFormState, 'isValid'>]: string } = {
     departureAirport: "Aeroporto de Partida",
@@ -17,7 +15,7 @@ const fieldLabels: { [K in keyof Omit<FlightFormState, 'isValid'>]: string } = {
     arrivalTime: "Horário de Chegada",
 };
 
-export function CreateFlightForm() {
+export function CreateFlightForm({ onClose }: { onClose: () => void }) {
 
     const [state, setState] = useState<FlightFormState>({
         departureAirport: "",
@@ -29,7 +27,6 @@ export function CreateFlightForm() {
         isValid: true,
     });
 
-    const navigate = useNavigate();
 
     const handleChange = (field: keyof FlightFormState, value: string) => {
         setState({ ...state, [field]: value });
@@ -70,7 +67,7 @@ export function CreateFlightForm() {
                         variant: "success",
                         title: "Voo criado com sucesso!",
                     })
-                    navigate('/flights');
+                    onClose();
                 })
                 .catch(() => {
                     toast({
@@ -82,64 +79,48 @@ export function CreateFlightForm() {
         }
     };
 
-
-
     return (
-        <div className="h-full flex items-center justify-center px-4">
-            <Card className="w-full max-w-xl">
-                <form onSubmit={handleSubmit}>
-                    <CardHeader>
-                        <CardTitle className="text-2xl">Criar Novo Voo</CardTitle>
-                        <CardDescription>
-                            Preencha as informações do voo.
-                        </CardDescription>
-                    </CardHeader>
-                    <CardContent>
-                        <div className="grid gap-4">
-                            {(Object.keys(fieldLabels) as (keyof Omit<FlightFormState, 'isValid'>)[]).map((field) => (
-                                <div key={field} className="grid gap-2">
-                                    <Label htmlFor={field}>{fieldLabels[field]}</Label>
-                                    {field.includes("Time") ? (
-                                        <div className="flex space-x-2">
-                                            <FormField
-                                                field={`${field}Hour`}
-                                                value={state[field]?.split(":")[0] || ""}
-                                                onChange={(value) => handleTimeChange(field, "hour", value)}
-                                                type="hour"
-                                                placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                                placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                                placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
-                                            />
-                                            <FormField
-                                                field={`${field}Minute`}
-                                                value={state[field]?.split(":")[1] || ""}
-                                                onChange={(value) => handleTimeChange(field, "minute", value)}
-                                                type="minute"
-                                                placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                                placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                                placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
-                                            />
-                                        </div>
-                                    ) : (
-                                        <FormField
-                                            field={field}
-                                            value={state[field]}
-                                            onChange={(value) => handleChange(field, value)}
-                                            type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : 'text'}
-                                            placeholder={fieldLabels[field]}
-                                            placeholderHour={""}
-                                            placeholderMinute={""}
-                                        />
-                                    )}
-                                </div>
-                            ))}
-                            <Button type="submit" className="w-full">
-                                Criar Voo
-                            </Button>
-                        </div>
-                    </CardContent>
-                </form>
-            </Card>
-        </div>
+        <form onSubmit={handleSubmit}>
+            <div className="grid gap-4">
+                {(Object.keys(fieldLabels) as (keyof Omit<FlightFormState, 'isValid'>)[]).map((field) => (
+                    <div key={field} className="grid gap-2">
+                        <Label htmlFor={field}>{fieldLabels[field]}</Label>
+                        {field.includes("Time") ? (
+                            <div className="flex space-x-2">
+                                <FormField
+                                    field={`${field}Hour`}
+                                    value={state[field]?.split(":")[0] || ""}
+                                    onChange={(value) => handleTimeChange(field, "hour", value)}
+                                    type="hour"
+                                    placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                    placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                    placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
+                                />
+                                <FormField
+                                    field={`${field}Minute`}
+                                    value={state[field]?.split(":")[1] || ""}
+                                    onChange={(value) => handleTimeChange(field, "minute", value)}
+                                    type="minute"
+                                    placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                    placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
+                                    placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
+                                />
+                            </div>
+                        ) : (
+                            <FormField
+                                field={field}
+                                value={state[field]}
+                                onChange={(value) => handleChange(field, value)}
+                                type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : 'text'}
+                                placeholder={fieldLabels[field]}
+                                placeholderHour={""}
+                                placeholderMinute={""}
+                            />
+                        )}
+                    </div>
+                ))}
+                <Button type="submit" className="mt-4">Criar Voo</Button>
+            </div>
+        </form>
     );
 }
