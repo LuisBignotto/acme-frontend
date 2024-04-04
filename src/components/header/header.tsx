@@ -31,12 +31,7 @@ const Header: React.FC<HeaderProps> = ({ userLoggedIn }) => {
 
       {userLoggedIn ? (
         <Link to="../">
-          <Avatar>
-            <AvatarImage src="https://github.com/shadcn.png" />
-            <AvatarFallback>
-              <CircleUserRound size={50}/>
-            </AvatarFallback>
-          </Avatar>
+          <Button>Configurações</Button>
         </Link>
       ) : (
         <Link to="../">
