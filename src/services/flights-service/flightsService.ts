@@ -19,6 +19,15 @@ export const getFlight = async (flightId: string) => {
     }
 };
 
+export const getFlightByTag = async (flightTag: string) => {
+    try {
+        const response = await api.get(`/flights/tag/${flightTag}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const deleteFlight = async (flightId: string) => {
     try {
         await api.delete(`/flights/${flightId}`);

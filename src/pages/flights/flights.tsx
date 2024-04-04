@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { deleteFlight, getFlights } from "@/services/flights-service/flightsService";
+import { deleteFlight, getFlightByTag, getFlights } from "@/services/flights-service/flightsService";
 import { Flight } from "@/interfaces/flight-interfaces/FlightInterfaces";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
@@ -7,8 +7,10 @@ import FlightTable from "./components/flight-table";
 import PaginationComponent from "@/components/pagination/pagination-comp";
 import { FlightsResponse } from "@/interfaces/flight-interfaces/FlightsResponse";
 import { useToast } from "@/components/ui/use-toast";
+import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CreateFlightForm } from "./components/create";
+import { SearchFlightForm } from "./components/search-flight-form";
 
 
 export function FlightsPage() {
@@ -17,6 +19,8 @@ export function FlightsPage() {
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
     const [isOpen, setIsOpen] = useState(false);
+    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const navigate = useNavigate();
     const { toast } = useToast()
 
     const fetchFlights = async () => {
@@ -62,6 +66,23 @@ export function FlightsPage() {
         setCurrentPage(newPage);
     };
 
+    const handleSearch = async (searchTerm: string) => {
+        try {
+            const flight = await getFlightByTag(searchTerm);
+
+            if (flight) {
+                navigate(`/flights/${flight.data.id}`);
+            } 
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Voo não encontrado",
+                description: "Nenhum voo encontrado com a tag fornecida.",
+            });
+        }
+        setIsSearchOpen(false);
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-full flex-grow overflow-auto py-12 px-12">
@@ -72,7 +93,7 @@ export function FlightsPage() {
 
     return (
         <div className="flex-grow overflow-auto py-12 px-12">
-            <div className="mb-4">
+            <div className="mb-4 flex space-x-1">
                 <Dialog open={isOpen} onOpenChange={setIsOpen}>
                     <DialogTrigger asChild>
                         <Button>Criar Novo Voo</Button>
@@ -82,6 +103,17 @@ export function FlightsPage() {
                             <DialogTitle>Criar Novo Voo</DialogTitle>
                         </DialogHeader>
                         <CreateFlightForm onClose={() => setIsOpen(false)} />
+                    </DialogContent>
+                </Dialog>
+                <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                    <DialogTrigger asChild>
+                        <Button>Buscar Voo</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Buscar Voo</DialogTitle>
+                        </DialogHeader>
+                        <SearchFlightForm onSearch={handleSearch} />
                     </DialogContent>
                 </Dialog>
             </div>
