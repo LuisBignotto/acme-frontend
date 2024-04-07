@@ -7,7 +7,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 
 const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit }) => {
     return (
-        <Table className="rounded-lg overflow-hidden min-w-screen-md shadow-lg">
+        <Table className="rounded-lg overflow-hidden min-w-screen-md shadow-lg min-w-6xl">
             <TableHeader className="bg-gray-100">
                 <TableRow>
                     <TableHead className="px-4 py-2">ID</TableHead>

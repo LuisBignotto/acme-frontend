@@ -8,12 +8,12 @@ import BaggageTable from "./components/baggage-table";
 import { SearchBaggageByTag } from "./components/search-by-tag";
 import { SearchBaggageByEmail } from "./components/search-by-email";
 import { getAllBaggages, deleteBaggage, getBaggageByTag, getBaggagesByEmail, updateBaggage, createBaggage } from "../../services/baggage-service/baggageService";
-import { useNavigate } from "react-router-dom";
 import BaggageDetails from "./components/baggage-details";
 import { getFlight, getFlightByTag } from "@/services/flights-service/flightsService";
 import BaggageCreateDetails from "./components/baggage-create";
 import { getUserByEmail } from "@/services/user-service/userService";
 import { BaggageFormState } from "@/interfaces/baggage-interfaces/BaggageFormState";
+import BaggageSearchResults from "./components/baggage-list";
 
 export function BaggagesPage() {
     const [baggages, setBaggages] = useState<Baggages[]>([]);
@@ -23,8 +23,12 @@ export function BaggagesPage() {
     const [isSearchByEmailOpen, setIsSearchByEmailOpen] = useState(false);
     const [foundBaggage, setFoundBaggage] = useState<Baggages | null>(null);
     const [isBaggageDetailsOpen, setIsBaggageDetailsOpen] = useState(false);
+    const [foundBaggagesByEmail, setFoundBaggagesByEmail] = useState<Baggages[]>([]);
+    const [isEditBaggageOpen, setIsEditBaggageOpen] = useState(false);
+    const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
+    const [baggageToDelete, setBaggageToDelete] = useState<string | null>(null);
+
     const { toast } = useToast();
-    const navigate = useNavigate();
 
     useEffect(() => {
         const fetchBaggages = async () => {
@@ -107,24 +111,38 @@ export function BaggagesPage() {
     };
 
     const handleDeleteBaggage = async (id: string) => {
-        try {
-            await deleteBaggage(id);
-            const updatedBaggages = baggages.filter((baggage) => baggage.id !== id);
-            setBaggages(updatedBaggages);
-            setIsSearchByTagOpen(false);
-            toast({
-                variant: "success",
-                title: "Bagagem apagada com sucesso!",
-            });
-        } catch (error) {
-            console.error("Erro ao excluir bagagem:", error);
-            toast({
-                variant: "destructive",
-                title: "Erro ao excluir bagagem!",
-            });
+        setBaggageToDelete(id);
+        setIsDeleteConfirmationOpen(true);
+    };
+
+    const confirmDeleteBaggage = async () => {
+        if (baggageToDelete) {
+            try {
+                await deleteBaggage(baggageToDelete);
+                const updatedBaggages = baggages.filter((baggage) => baggage.id !== baggageToDelete);
+                setBaggages(updatedBaggages);
+                const updatedFoundBaggages = foundBaggagesByEmail.filter((baggage) => baggage.id !== baggageToDelete);
+                setFoundBaggagesByEmail(updatedFoundBaggages);
+                setIsDeleteConfirmationOpen(false);
+                setBaggageToDelete(null);
+                toast({
+                    variant: "success",
+                    title: "Bagagem apagada com sucesso!",
+                });
+            } catch (error) {
+                console.error("Erro ao excluir bagagem:", error);
+                toast({
+                    variant: "destructive",
+                    title: "Erro ao excluir bagagem!",
+                });
+            }
         }
     };
 
+    const cancelDeleteBaggage = () => {
+        setIsDeleteConfirmationOpen(false);
+        setBaggageToDelete(null);
+    };
 
     const handleSearchByTag = async (searchTerm: string) => {
         try {
@@ -157,16 +175,26 @@ export function BaggagesPage() {
 
     const handleSearchByEmail = async (searchTerm: string) => {
         try {
-            const baggage = await getBaggagesByEmail(searchTerm);
-            console.log(baggage)
-            // if (baggage) {
-            //     navigate(`/baggages/${baggage.id}`);
-            // }
+            const baggages = await getBaggagesByEmail(searchTerm);
+            if (baggages.data.length > 0) {
+                setFoundBaggagesByEmail(baggages.data);
+                setIsBaggageDetailsOpen(true);
+                toast({
+                    variant: "success",
+                    title: "Bagagens encontradas com sucesso!",
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Nenhuma bagagem encontrada",
+                    description: "Nenhuma bagagem encontrada com o email fornecido.",
+                });
+            }
         } catch (error) {
             toast({
                 variant: "destructive",
-                title: "Bagagem não encontrada",
-                description: "Nenhuma bagagem encontrada com a tag fornecida.",
+                title: "Erro ao buscar bagagens",
+                description: "Tente novamente mais tarde.",
             });
         }
         setIsSearchByEmailOpen(false);
@@ -174,7 +202,9 @@ export function BaggagesPage() {
 
     const handleEditBaggage = (baggageToEdit: Baggages) => {
         setFoundBaggage(baggageToEdit);
-        setIsBaggageDetailsOpen(true);
+        setIsEditBaggageOpen(true);
+        setIsSearchByEmailOpen(false);
+        setIsBaggageDetailsOpen(false);
     };
 
     const handleUpdateBaggage = async (updatedBaggage: Baggages) => {
@@ -239,10 +269,10 @@ export function BaggagesPage() {
                         <SearchBaggageByTag onSearch={handleSearchByTag} />
                     </DialogContent>
                 </Dialog>
-                <Dialog open={isBaggageDetailsOpen} onOpenChange={setIsBaggageDetailsOpen}>
+                <Dialog open={isEditBaggageOpen} onOpenChange={setIsEditBaggageOpen}>
                     <DialogContent>
                         <DialogHeader>
-                            <DialogTitle>Detalhes da Bagagem</DialogTitle>
+                            <DialogTitle>Editar Bagagem</DialogTitle>
                         </DialogHeader>
                         {foundBaggage && <BaggageDetails onSave={handleUpdateBaggage} onDelete={handleDeleteBaggage} baggage={foundBaggage} />}
                     </DialogContent>
@@ -256,6 +286,34 @@ export function BaggagesPage() {
                             <DialogTitle>Buscar por Email</DialogTitle>
                         </DialogHeader>
                         <SearchBaggageByEmail onSearch={handleSearchByEmail} />
+                    </DialogContent>
+                </Dialog>
+                <Dialog open={isBaggageDetailsOpen} onOpenChange={setIsBaggageDetailsOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Bagagens</DialogTitle>
+                        </DialogHeader>
+                        <BaggageSearchResults
+                            baggages={foundBaggagesByEmail}
+                            onEdit={handleEditBaggage}
+                            onDelete={handleDeleteBaggage}
+                        />
+                    </DialogContent>
+                </Dialog>
+                <Dialog open={isDeleteConfirmationOpen} onOpenChange={setIsDeleteConfirmationOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Confirmar Exclusão</DialogTitle>
+                        </DialogHeader>
+                        <p>Tem certeza de que deseja excluir esta bagagem?</p>
+                        <div className="flex justify-end space-x-2 mt-4">
+                            <Button variant="outline" onClick={cancelDeleteBaggage}>
+                                Cancelar
+                            </Button>
+                            <Button variant="destructive" onClick={confirmDeleteBaggage}>
+                                Excluir
+                            </Button>
+                        </div>
                     </DialogContent>
                 </Dialog>
             </div>
