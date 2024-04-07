@@ -1,4 +1,4 @@
-export interface Bagages {
+export interface Baggages {
     id: string;
     userId: string;
     tag: string;

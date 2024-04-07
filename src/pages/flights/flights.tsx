@@ -12,7 +12,6 @@ import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from 
 import { CreateFlightForm } from "./components/create";
 import { SearchFlightForm } from "./components/search-flight-form";
 
-
 export function FlightsPage() {
     const [flights, setFlights] = useState<Flight[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
@@ -72,7 +71,7 @@ export function FlightsPage() {
 
             if (flight) {
                 navigate(`/flights/${flight.data.id}`);
-            } 
+            }
         } catch (error) {
             toast({
                 variant: "destructive",
@@ -96,7 +95,9 @@ export function FlightsPage() {
             <div className="mb-4 flex space-x-1">
                 <Dialog open={isOpen} onOpenChange={setIsOpen}>
                     <DialogTrigger asChild>
-                        <Button>Criar Novo Voo</Button>
+                        <Button>
+                            Criar Voo
+                        </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>
@@ -107,7 +108,9 @@ export function FlightsPage() {
                 </Dialog>
                 <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
                     <DialogTrigger asChild>
-                        <Button>Buscar Voo</Button>
+                        <Button>
+                            Buscar Voo
+                        </Button>
                     </DialogTrigger>
                     <DialogContent>
                         <DialogHeader>

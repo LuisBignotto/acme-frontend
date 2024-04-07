@@ -1,4 +1,4 @@
-export interface BagageFormState {
+export interface BaggageFormState {
     userEmail: string;
     tag: string;
     color: string;

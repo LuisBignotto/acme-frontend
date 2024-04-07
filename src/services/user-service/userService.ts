@@ -18,6 +18,15 @@ export const getInactiveUsers = async (page: number, size: number, sort: string)
     }
 };
 
+export const getUserByEmail = async (email: string) => {
+    try {
+        const response = await api.get(`/users/${email}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getUser = async () => {
     try {
         const response = await api.get("/users");

@@ -4,6 +4,6 @@ export interface FormFieldProps {
     onChange: (value: string) => void;
     type: 'text' | 'date' | 'minute' | 'hour';
     placeholder: string;
-    placeholderHour: string;
-    placeholderMinute: string;
+    placeholderHour?: string;
+    placeholderMinute?: string;
 }

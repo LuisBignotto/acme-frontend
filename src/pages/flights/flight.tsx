@@ -4,16 +4,16 @@ import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { getFlight } from "@/services/flights-service/flightsService";
 import { createBaggage, deleteBaggage } from "@/services/baggage-service/baggageService";
-import { Bagages } from "@/interfaces/baggage-interfaces/Bagages";
+import { Baggages } from "@/interfaces/baggage-interfaces/Baggages";
 import BagageTable from "../baggages/components/baggage-table";
 import { Button } from "@/components/ui/button";
 import SelectStatus from '../baggages/components/select-status';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
-import { BagageFormState } from "@/interfaces/baggage-interfaces/BagageFormState";
+import { BaggageFormState } from "@/interfaces/baggage-interfaces/BaggageFormState";
 import { Label } from "@/components/ui/label";
 import FormField from "@/components/form-field/form-field";
 
-const fieldLabels: { [K in keyof Omit<BagageFormState, 'isValid' | 'tag' | 'flightId'>]: string } = {
+const fieldLabels: { [K in keyof Omit<BaggageFormState, 'isValid' | 'tag' | 'flightId'>]: string } = {
     userEmail: "User Email",
     color: "Cor",
     weight: "Peso",
@@ -27,9 +27,9 @@ const statusOptions = [
 
 export function FlightPage() {
     const [loading, setLoading] = useState<boolean>(true);
-    const [baggages, setBaggages] = useState<Bagages[]>([]);
+    const [baggages, setBaggages] = useState<Baggages[]>([]);
     const [isOpen, setIsOpen] = useState(false);
-    const [state, setState] = useState<BagageFormState>({
+    const [state, setState] = useState<BaggageFormState>({
         userEmail: "",
         tag: "",
         color: "",
@@ -54,7 +54,7 @@ export function FlightPage() {
             toast({
                 variant: "destructive",
                 title: "Falha ao buscar as bagagens do voo!",
-                description: "Entre novamente para ver as bagagens.",
+                description: "Ocorreu um erro ao buscar os voos.",
             })
         } finally {
             setLoading(false);
@@ -65,7 +65,7 @@ export function FlightPage() {
         fetchFlight();
     }, [flightId]);
 
-    const handleChange = (field: keyof Omit<BagageFormState, 'tag' | 'flightId'>, value: string) => {
+    const handleChange = (field: keyof Omit<BaggageFormState, 'tag' | 'flightId'>, value: string) => {
         setState({ ...state, [field]: value });
     };
 
@@ -153,7 +153,7 @@ export function FlightPage() {
                         </DialogHeader>
                         <form onSubmit={handleSubmit}>
                             <div className="grid gap-4">
-                                {(Object.keys(fieldLabels) as (keyof Omit<BagageFormState, 'isValid' | 'tag' | 'flightId'>)[]).map((field) => (
+                                {(Object.keys(fieldLabels) as (keyof Omit<BaggageFormState, 'isValid' | 'tag' | 'flightId'>)[]).map((field) => (
                                     <div key={field} className="grid gap-2">
                                         <Label htmlFor={field}>{fieldLabels[field]}</Label>
                                         {field === 'status' ? (
@@ -184,7 +184,7 @@ export function FlightPage() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <BagageTable bagages={baggages} onDelete={handleDeleteBaggage} />
+            <BagageTable baggages={baggages} onDelete={handleDeleteBaggage} />
         </div>
     );
 }

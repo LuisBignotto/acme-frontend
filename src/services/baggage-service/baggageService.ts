@@ -18,6 +18,24 @@ export const getAllBaggages = async () => {
     }
 };
 
+export const getBaggageByTag = async (baggageTag: string) => {
+    try {
+        const response = await api.get(`/baggages/tag/${baggageTag}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
+export const getBaggagesByEmail = async (email: string) => {
+    try {
+        const response = await api.get(`/baggages/email/${email}`);
+        return response;
+    } catch (error) {
+        throw error;
+    }
+};
+
 export const getUserBaggage = async (baggageId: string) => {
     try {
         const response = await api.get(`/baggages/add/${baggageId}`);

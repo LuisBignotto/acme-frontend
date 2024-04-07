@@ -6,8 +6,9 @@ import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { FlightTableProps } from '@/interfaces/flight-interfaces/FlightTableProps';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { UpdateFlightForm } from '../update';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { UpdateFlightForm } from './update';
+import { Pencil, Trash2 } from 'lucide-react';
 
 const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
     const [selectedFlightId, setSelectedFlightId] = React.useState<string | null>(null);
@@ -19,7 +20,6 @@ const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
     const closeEditDialog = () => {
         setSelectedFlightId(null);
     };
-
 
     return (
         <Table className="rounded-lg overflow-hidden min-w-screen-md shadow-lg">
@@ -43,13 +43,19 @@ const FlightTable: React.FC<FlightTableProps> = ({ flights, onDelete }) => {
                         <TableCell className="px-4 py-2">{flight.arrivalAirport}</TableCell>
                         <TableCell className="px-4 py-2 flex space-x-2">
                             <Link to={`/flights/${flight.id}`}>
-                                <Button>Ver Bagagens</Button>
+                                <Button>
+                                    Bagagens
+                                </Button>
                             </Link>
-                            <Button onClick={() => openEditDialog(flight.id)}>Editar</Button>
+                            <Button onClick={() => openEditDialog(flight.id)}>
+                                <Pencil size={22} />
+                            </Button>
                             <div>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
-                                        <Button className="bg-red-700 hover:bg-red-600">Apagar</Button>
+                                        <Button className="bg-red-700 hover:bg-red-600">
+                                            <Trash2 />
+                                        </Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>

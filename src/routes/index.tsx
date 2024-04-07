@@ -4,6 +4,7 @@ import { LoginForm } from '../pages/login/login';
 import { FlightsPage } from '@/pages/flights/flights';
 import ProtectedRoute from './ProtectedRoute';
 import { FlightPage } from '@/pages/flights/flight';
+import { BaggagesPage } from '@/pages/baggages/baggages';
 
 const router = createBrowserRouter([
  {
@@ -21,6 +22,10 @@ const router = createBrowserRouter([
       {
         path: '/flights/:flightId',
         element: <ProtectedRoute element={<FlightPage />} redirectTo="/" />
+      },
+      {
+        path: '/baggages',
+        element: <ProtectedRoute element={<BaggagesPage />} redirectTo="/" />
       }
     ]
  }

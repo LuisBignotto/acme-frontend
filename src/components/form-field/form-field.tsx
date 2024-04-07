@@ -21,7 +21,7 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange, type, pla
                     <SelectMinute
                         value={value}
                         onChange={onChange}
-                        placeholder={placeholderMinute}
+                        placeholder={placeholderMinute || ''}
                     />
                 </div>
             );
@@ -31,7 +31,7 @@ const FormField: React.FC<FormFieldProps> = ({ field, value, onChange, type, pla
                     <SelectHour
                         value={value}
                         onChange={onChange}
-                        placeholder={placeholderHour}
+                        placeholder={placeholderHour || ''}
                     />
                 </div>
             );
