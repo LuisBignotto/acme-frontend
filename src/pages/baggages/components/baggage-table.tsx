@@ -31,9 +31,11 @@ const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit 
                         <TableCell className="px-4 py-2">{baggage.status}</TableCell>
                         <TableCell className="px-4 py-2">{baggage.lastSeenLocation}</TableCell>
                         <TableCell className="px-4 py-2 flex space-x-2">
-                            <Button onClick={() => onEdit && onEdit(baggage)}>
-                                <Pencil size={22} />
-                            </Button>
+                            {onEdit && (
+                                <Button onClick={() => onEdit(baggage)}>
+                                    <Pencil size={22} />
+                                </Button>
+                            )}
                             <div>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>

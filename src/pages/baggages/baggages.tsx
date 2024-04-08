@@ -151,7 +151,7 @@ export function BaggagesPage() {
 
             if (baggage) {
                 setFoundBaggage(baggage);
-                setIsBaggageDetailsOpen(true);
+                setIsEditBaggageOpen(true);
                 toast({
                     variant: "success",
                     title: "Bagagem encontrada com sucesso!",
