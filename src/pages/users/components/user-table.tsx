@@ -6,8 +6,21 @@ interface User {
     id: string;
     name: string;
     email: string;
+    password: string;
+    phone: string | null;
     role: string;
-    status: string;
+    address: Address | null;
+}
+
+
+interface Address {
+    street: string;
+    neighborhood: string;
+    zipcode: string;
+    number: string;
+    complement: string;
+    city: string;
+    state: string;
 }
 
 interface UserTableProps {
@@ -16,6 +29,21 @@ interface UserTableProps {
     onDelete: (userId: string) => void;
 }
 
+const getRoleLabel = (role: string) => {
+    switch (role) {
+        case "ADMINISTRATOR":
+            return "Administrador";
+        case "REGULAR_USER":
+            return "Usuário Regular";
+        case "BAGGAGE_MANAGER":
+            return "Gerente de Bagagem";
+        case "SUPPORT":
+            return "Suporte";
+        default:
+            return role;
+    }
+};
+
 const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
     return (
         <Table>
@@ -23,8 +51,9 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
                 <TableRow>
                     <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>Telefone</TableHead>
                     <TableHead>Função</TableHead>
-                    <TableHead>Status</TableHead>
+                    <TableHead>Endereço</TableHead>
                     <TableHead>Ações</TableHead>
                 </TableRow>
             </TableHeader>
@@ -33,8 +62,19 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
                     <TableRow key={user.id}>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.role}</TableCell>
-                        <TableCell>{user.status}</TableCell>
+                        <TableCell>{user.phone || "-"}</TableCell>
+                        <TableCell>{getRoleLabel(user.role)}</TableCell>
+                        <TableCell>
+                            {user.address ? (
+                                <div>
+                                    {user.address.street}, {user.address.number}<br />
+                                    {user.address.neighborhood}, {user.address.city} - {user.address.state}<br />
+                                    {user.address.zipcode}
+                                </div>
+                            ) : (
+                                "-"
+                            )}
+                        </TableCell>
                         <TableCell>
                             <div className="flex space-x-2">
                                 <Button

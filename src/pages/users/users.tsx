@@ -3,43 +3,70 @@ import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { getActiveUsers, getInactiveUsers, deleteUser, updateUser, registerUser } from "../../services/user-service/userService";
+import { getActiveUsers, deleteUser, updateUser, registerUser } from "../../services/user-service/userService";
 import UserTable from "./components/user-table";
 import UserDetails from "./components/user-details";
 import UserCreateDetails from "./components/user-create-details";
+import PaginationComponent from "@/components/pagination/pagination-comp";
 
 interface User {
     id: string;
     name: string;
     email: string;
+    password: string;
+    phone: string | null;
     role: string;
-    status: string;
+    address: Address | null;
+}
+
+interface Address {
+    street: string;
+    neighborhood: string;
+    zipcode: string;
+    number: string;
+    complement: string;
+    city: string;
+    state: string;
+}
+
+interface UsersResponse {
+    content: User[];
+    totalPages: number;
+    number: number;
 }
 
 export function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(0);
     const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isUserDetailsOpen, setIsUserDetailsOpen] = useState<boolean>(false);
     const { toast } = useToast();
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const activeUsers = await getActiveUsers(0, 10, "name");
-                const inactiveUsers = await getInactiveUsers(0, 10, "name");
-                const allUsers = [...activeUsers, ...inactiveUsers];
-                setUsers(allUsers);
-                setLoading(false);
-            } catch (error) {
-                console.error("Erro ao buscar usuários:", error);
-                setLoading(false);
-            }
-        };
+    const fetchUsers = async () => {
+        setLoading(true);
+        try {
+            const data: UsersResponse = await getActiveUsers(currentPage, 10, "name");
+            setUsers(data.content);
+            setTotalPages(data.totalPages);
+            setCurrentPage(data.number);
+        } catch (error) {
+            console.error("Erro ao buscar usuários:", error);
+            toast({
+                variant: "destructive",
+                title: "Falha ao buscar usuários!",
+                description: "Ocorreu um erro ao buscar os usuários.",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
 
+    useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [currentPage]);
 
     const handleCreateUser = async (newUser: User) => {
         try {
@@ -103,6 +130,10 @@ export function UsersPage() {
         }
     };
 
+    const handlePageChange = (newPage: number) => {
+        setCurrentPage(newPage);
+    };
+
     if (loading) {
         return (
             <div className="flex items-center justify-center h-full flex-grow overflow-auto py-12 px-12">
@@ -145,6 +176,13 @@ export function UsersPage() {
                 onDelete={handleDeleteUser}
                 onEdit={handleEditUser}
             />
+            <div className="mt-6 flex justify-center">
+                <PaginationComponent
+                    currentPage={currentPage}
+                    totalPages={totalPages}
+                    onPageChange={handlePageChange}
+                />
+            </div>
         </div>
     );
 }
