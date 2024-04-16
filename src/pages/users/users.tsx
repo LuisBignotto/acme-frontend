@@ -8,6 +8,7 @@ import UserTable from "./components/user-table";
 import UserDetails from "./components/user-details";
 import UserCreateDetails from "./components/user-create-details";
 import PaginationComponent from "@/components/pagination/pagination-comp";
+import { UserRegister } from "@/interfaces/user-interfaces/user-register";
 
 interface User {
     id: string;
@@ -68,23 +69,25 @@ export function UsersPage() {
         fetchUsers();
     }, [currentPage]);
 
-    const handleCreateUser = async (newUser: User) => {
+    const handleCreateUser = async (newUser: UserRegister) => {
+        const user = {...newUser, active: true}
         try {
-            const createdUser = await registerUser(newUser);
-            setUsers([...users, createdUser]);
-            setIsCreateOpen(false);
+            await registerUser(user);
             toast({
                 variant: "success",
                 title: "Usuário criado com sucesso!",
             });
+            fetchUsers(); 
+            setIsCreateOpen(false);
         } catch (error) {
-            console.error("Erro ao criar usuário:", error);
             toast({
                 variant: "destructive",
                 title: "Erro ao criar usuário!",
+                description: "Não foi possível criar o usuário.",
             });
         }
     };
+
 
     const handleDeleteUser = async (userId: string) => {
         try {
