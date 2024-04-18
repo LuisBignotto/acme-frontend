@@ -1,6 +1,7 @@
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
+import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
 
 interface User {
     id: string;
@@ -83,13 +84,25 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
                                 >
                                     <Pencil size={22} />
                                 </Button>
-                                <Button
-                                    variant="destructive"
-                                    size="sm"
-                                    onClick={() => onDelete(user.id)}
-                                >
-                                    <Trash2 />
-                                </Button>
+                                <AlertDialog>
+                                    <AlertDialogTrigger asChild>
+                                        <Button
+                                            variant="destructive"
+                                            size="sm"
+
+                                        >
+                                            <Trash2 />
+                                        </Button>
+                                    </AlertDialogTrigger>
+                                    <AlertDialogContent>
+                                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                        <AlertDialogDescription>Tem certeza de que deseja excluir este voo?</AlertDialogDescription>
+                                        <AlertDialogFooter>
+                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                            <AlertDialogAction onClick={() => onDelete(user.id)}>Confirmar</AlertDialogAction>
+                                        </AlertDialogFooter>
+                                    </AlertDialogContent>
+                                </AlertDialog>
                             </div>
                         </TableCell>
                     </TableRow>
