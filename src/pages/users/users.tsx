@@ -9,32 +9,8 @@ import UserDetails from "./components/user-details";
 import UserCreateDetails from "./components/user-create-details";
 import PaginationComponent from "@/components/pagination/pagination-comp";
 import { UserRegister } from "@/interfaces/user-interfaces/user-register";
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    phone: string | null;
-    role: string;
-    address: Address | null;
-}
-
-interface Address {
-    street: string;
-    neighborhood: string;
-    zipcode: string;
-    number: string;
-    complement: string;
-    city: string;
-    state: string;
-}
-
-interface UsersResponse {
-    content: User[];
-    totalPages: number;
-    number: number;
-}
+import { User } from "@/interfaces/user-interfaces/user";
+import { UsersResponse } from "@/interfaces/user-interfaces/user-response";
 
 export function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);

@@ -11,6 +11,7 @@ const UserCreateDetails: React.FC<UserCreateDetailsProps> = ({ onSave }) => {
         id: '',
         name: '',
         email: '',
+        cpf: '',
         password: '',
         role: '',
     });
@@ -32,6 +33,10 @@ const UserCreateDetails: React.FC<UserCreateDetailsProps> = ({ onSave }) => {
             <div className="sm:col-span-2">
                 <Label htmlFor="email">Email:</Label>
                 <Input id="email" type="email" value={newUser.email} onChange={(e) => handleChange('email', e.target.value)} />
+            </div>
+            <div className="sm:col-span-2">
+                <Label htmlFor="cpf">CPF:</Label>
+                <Input id="cpf" value={newUser.cpf} onChange={(e) => handleChange('cpf', e.target.value)} />
             </div>
             <div className="sm:col-span-2">
                 <Label htmlFor="password">Senha:</Label>

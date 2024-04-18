@@ -3,32 +3,10 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { UserDetailsProps } from '@/interfaces/user-interfaces/user-details-props';
+import { User } from '@/interfaces/user-interfaces/user';
+import { Address } from '@/interfaces/user-interfaces/address';
 
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    phone: string | null;
-    role: string;
-    address: Address | null;
-}
-
-interface Address {
-    street: string;
-    neighborhood: string;
-    zipcode: string;
-    number: string;
-    complement: string;
-    city: string;
-    state: string;
-}
-
-interface UserDetailsProps {
-    user: User;
-    onSave: (updatedUser: User) => void;
-    onDelete: (userId: string) => void;
-}
 
 const UserDetails: React.FC<UserDetailsProps> = ({ user, onSave, onDelete }) => {
     const [updatedUser, setUpdatedUser] = useState<User>(user);

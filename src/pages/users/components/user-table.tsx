@@ -2,33 +2,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Button } from "@/components/ui/button";
 import { Pencil, Trash2 } from "lucide-react";
 import { AlertDialog, AlertDialogContent, AlertDialogDescription, AlertDialogTitle, AlertDialogTrigger, AlertDialogFooter, AlertDialogCancel, AlertDialogAction } from "@/components/ui/alert-dialog";
-
-interface User {
-    id: string;
-    name: string;
-    email: string;
-    password: string;
-    phone: string | null;
-    role: string;
-    address: Address | null;
-}
-
-
-interface Address {
-    street: string;
-    neighborhood: string;
-    zipcode: string;
-    number: string;
-    complement: string;
-    city: string;
-    state: string;
-}
-
-interface UserTableProps {
-    users: User[];
-    onEdit: (user: User) => void;
-    onDelete: (userId: string) => void;
-}
+import { UserTableProps } from "@/interfaces/user-interfaces/user-table-props";
 
 const getRoleLabel = (role: string) => {
     switch (role) {
