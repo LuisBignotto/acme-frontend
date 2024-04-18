@@ -26,6 +26,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
                 <TableRow>
                     <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
+                    <TableHead>CPF</TableHead>
                     <TableHead>Telefone</TableHead>
                     <TableHead>Função</TableHead>
                     <TableHead>Endereço</TableHead>
@@ -37,6 +38,7 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
                     <TableRow key={user.id}>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
+                        <TableCell>{user.cpf}</TableCell>
                         <TableCell>{user.phone || "-"}</TableCell>
                         <TableCell>{getRoleLabel(user.role)}</TableCell>
                         <TableCell>
