@@ -47,7 +47,11 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onSave, onDelete }) => 
                 <Label htmlFor="email">Email:</Label>
                 <Input id="email" type="email" value={updatedUser.email} onChange={(e) => handleChange('email', e.target.value)} />
             </div>
-            <div className="sm:col-span-2">
+            <div>
+                <Label htmlFor="cpf">CPF:</Label>
+                <Input id="cpf" value={updatedUser.cpf || ''} onChange={(e) => handleChange('cpf', e.target.value)} />
+            </div>
+            <div>
                 <Label htmlFor="role">Função:</Label>
                 <Select value={updatedUser.role} onValueChange={(value) => handleChange('role', value)}>
                     <SelectTrigger>
