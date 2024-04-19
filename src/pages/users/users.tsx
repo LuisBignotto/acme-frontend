@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { getActiveUsers, deleteUser, updateUser, registerUser } from "../../services/user-service/userService";
+import { getActiveUsers, deleteUser, updateUser, registerUser, getUserByEmail } from "../../services/user-service/userService";
 import UserTable from "./components/user-table";
 import UserDetails from "./components/user-details";
 import UserCreateDetails from "./components/user-create-details";
@@ -11,6 +11,7 @@ import PaginationComponent from "@/components/pagination/pagination-comp";
 import { UserRegister } from "@/interfaces/user-interfaces/user-register";
 import { User } from "@/interfaces/user-interfaces/user";
 import { UsersResponse } from "@/interfaces/user-interfaces/user-response";
+import { SearchUserByEmail } from "./components/search-by-email";
 
 export function UsersPage() {
     const [users, setUsers] = useState<User[]>([]);
@@ -20,6 +21,7 @@ export function UsersPage() {
     const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
     const [selectedUser, setSelectedUser] = useState<User | null>(null);
     const [isUserDetailsOpen, setIsUserDetailsOpen] = useState<boolean>(false);
+    const [isSearchByEmailOpen, setIsSearchByEmailOpen] = useState<boolean>(false);
     const { toast } = useToast();
 
     const fetchUsers = async () => {
@@ -46,14 +48,14 @@ export function UsersPage() {
     }, [currentPage]);
 
     const handleCreateUser = async (newUser: UserRegister) => {
-        const user = {...newUser, active: true}
+        const user = { ...newUser, active: true }
         try {
             await registerUser(user);
             toast({
                 variant: "success",
                 title: "Usuário criado com sucesso!",
             });
-            fetchUsers(); 
+            fetchUsers();
             setIsCreateOpen(false);
         } catch (error) {
             toast({
@@ -109,6 +111,35 @@ export function UsersPage() {
         }
     };
 
+    const handleSearchByEmail = async (email: string) => {
+        try {
+            const response = await getUserByEmail(email);
+            const user = response.data;
+            if (user) {
+                setSelectedUser(user);
+                setIsSearchByEmailOpen(false);
+                setIsUserDetailsOpen(true);
+                toast({
+                    variant: "success",
+                    title: "Usuário encontrado com sucesso!",
+                });
+            } else {
+                toast({
+                    variant: "destructive",
+                    title: "Usuário não encontrado",
+                    description: "Nenhum usuário encontrado com o email fornecido.",
+                });
+            }
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Erro ao buscar usuário",
+                description: "Tente novamente mais tarde.",
+            });
+        }
+    };
+
+
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);
     };
@@ -133,6 +164,17 @@ export function UsersPage() {
                             <DialogTitle>Criar Usuário</DialogTitle>
                         </DialogHeader>
                         <UserCreateDetails onSave={handleCreateUser} />
+                    </DialogContent>
+                </Dialog>
+                <Dialog open={isSearchByEmailOpen} onOpenChange={setIsSearchByEmailOpen}>
+                    <DialogTrigger asChild>
+                        <Button>Buscar por Email</Button>
+                    </DialogTrigger>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Buscar por Email</DialogTitle>
+                        </DialogHeader>
+                        <SearchUserByEmail onSearch={handleSearchByEmail} />
                     </DialogContent>
                 </Dialog>
                 <Dialog open={isUserDetailsOpen} onOpenChange={setIsUserDetailsOpen}>

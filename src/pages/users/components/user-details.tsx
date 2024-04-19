@@ -49,7 +49,7 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onSave, onDelete }) => 
             </div>
             <div>
                 <Label htmlFor="cpf">CPF:</Label>
-                <Input id="cpf" value={updatedUser.cpf || ''} onChange={(e) => handleChange('cpf', e.target.value)} />
+                <Input id="cpf" value={updatedUser.cpf || ''} onChange={(e) => handleChange('cpf', e.target.value)} disabled />
             </div>
             <div>
                 <Label htmlFor="role">Função:</Label>
