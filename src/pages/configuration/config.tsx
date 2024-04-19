@@ -7,6 +7,7 @@ import { getUser, updateUser } from '@/services/user-service/userService';
 import { useToast } from '@/components/ui/use-toast';
 import { User } from '@/interfaces/user-interfaces/user';
 import { Address } from '@/interfaces/user-interfaces/address';
+import { LoaderCircle } from 'lucide-react';
 
 export function UserProfile() {
     const [user, setUser] = useState<User | null>(null);
@@ -49,13 +50,46 @@ export function UserProfile() {
     };
 
     const handleSave = async () => {
+        if (newPassword && currentPassword) {
+            if (newPassword === currentPassword) {
+                toast({
+                    title: 'Erro',
+                    description: 'A nova senha deve ser diferente da senha atual.',
+                    variant: 'destructive',
+                });
+                return;
+            }
+
+            if (newPassword.length < 8) {
+                toast({
+                    title: 'Erro',
+                    description: 'A nova senha deve ter pelo menos 8 caracteres.',
+                    variant: 'destructive',
+                });
+                return;
+            }
+        }
+
         try {
-            await updateUser(user);
+            const updateData = {
+                name: user?.name,
+                email: user?.email,
+                password: newPassword || undefined,
+                currentPassword: currentPassword || undefined,
+                phone: user?.phone,
+                address: user?.address,
+                role: user?.role
+            };
+
+            const updatedUser = await updateUser(updateData);
+            setUser(updatedUser);
             toast({
                 title: 'Sucesso',
                 description: 'Perfil atualizado com sucesso.',
                 variant: 'success',
             });
+            setCurrentPassword('');
+            setNewPassword('');
         } catch (error) {
             toast({
                 title: 'Erro',
@@ -66,11 +100,11 @@ export function UserProfile() {
     };
 
     if (loading) {
-        return <div>Carregando...</div>;
-    }
-
-    if (error) {
-        return <div>{error}</div>;
+        return (
+            <div className="flex items-center justify-center h-full flex-grow overflow-auto py-12 px-12">
+                <LoaderCircle size={64} className="animate-spin text-darkblue" />
+            </div>
+        );
     }
 
     return (
