@@ -112,18 +112,16 @@ export function BaggagesPage() {
     const handleDeleteBaggage = async (baggageId: string) => {
         setBaggageToDelete(baggageId);
         try {
-            if(baggageToDelete != null){
-                await deleteBaggage(baggageId);
-                const updatedBaggages = baggages.filter((baggage) => baggage.id !== baggageId);
-                setBaggages(updatedBaggages);
-                const updatedFoundBaggages = foundBaggagesByEmail.filter((baggage) => baggage.id !== baggageId);
-                setFoundBaggagesByEmail(updatedFoundBaggages);
-                setBaggageToDelete(null);
-                toast({
-                    variant: "success",
-                    title: "Bagagem apagada com sucesso!",
-                });
-            }
+            await deleteBaggage(baggageId);
+            const updatedBaggages = baggages.filter((baggage) => baggage.id !== baggageId);
+            setBaggages(updatedBaggages);
+            const updatedFoundBaggages = foundBaggagesByEmail.filter((baggage) => baggage.id !== baggageId);
+            setFoundBaggagesByEmail(updatedFoundBaggages);
+            setBaggageToDelete(null);
+            toast({
+                variant: "success",
+                title: "Bagagem apagada com sucesso!",
+            });
         } catch (error) {
             console.error("Erro ao excluir bagagem:", error);
             toast({
