@@ -25,7 +25,6 @@ export function BaggagesPage() {
     const [isBaggageDetailsOpen, setIsBaggageDetailsOpen] = useState(false);
     const [foundBaggagesByEmail, setFoundBaggagesByEmail] = useState<Baggages[]>([]);
     const [isEditBaggageOpen, setIsEditBaggageOpen] = useState(false);
-    const [isDeleteConfirmationOpen, setIsDeleteConfirmationOpen] = useState(false);
     const [baggageToDelete, setBaggageToDelete] = useState<string | null>(null);
 
     const { toast } = useToast();
@@ -110,38 +109,26 @@ export function BaggagesPage() {
         }
     };
 
-    const handleDeleteBaggage = async (id: string) => {
-        setBaggageToDelete(id);
-        setIsDeleteConfirmationOpen(true);
-    };
-
-    const confirmDeleteBaggage = async () => {
-        if (baggageToDelete) {
-            try {
-                await deleteBaggage(baggageToDelete);
-                const updatedBaggages = baggages.filter((baggage) => baggage.id !== baggageToDelete);
-                setBaggages(updatedBaggages);
-                const updatedFoundBaggages = foundBaggagesByEmail.filter((baggage) => baggage.id !== baggageToDelete);
-                setFoundBaggagesByEmail(updatedFoundBaggages);
-                setIsDeleteConfirmationOpen(false);
-                setBaggageToDelete(null);
-                toast({
-                    variant: "success",
-                    title: "Bagagem apagada com sucesso!",
-                });
-            } catch (error) {
-                console.error("Erro ao excluir bagagem:", error);
-                toast({
-                    variant: "destructive",
-                    title: "Erro ao excluir bagagem!",
-                });
-            }
+    const handleDeleteBaggage = async (baggageId: string) => {
+        setBaggageToDelete(baggageId);
+        try {
+            await deleteBaggage(baggageId);
+            const updatedBaggages = baggages.filter((baggage) => baggage.id !== baggageId);
+            setBaggages(updatedBaggages);
+            const updatedFoundBaggages = foundBaggagesByEmail.filter((baggage) => baggage.id !== baggageId);
+            setFoundBaggagesByEmail(updatedFoundBaggages);
+            setBaggageToDelete(null);
+            toast({
+                variant: "success",
+                title: "Bagagem apagada com sucesso!",
+            });
+        } catch (error) {
+            console.error("Erro ao excluir bagagem:", error);
+            toast({
+                variant: "destructive",
+                title: "Erro ao excluir bagagem!",
+            });
         }
-    };
-
-    const cancelDeleteBaggage = () => {
-        setIsDeleteConfirmationOpen(false);
-        setBaggageToDelete(null);
     };
 
     const handleSearchByTag = async (searchTerm: string) => {
@@ -298,22 +285,6 @@ export function BaggagesPage() {
                             onEdit={handleEditBaggage}
                             onDelete={handleDeleteBaggage}
                         />
-                    </DialogContent>
-                </Dialog>
-                <Dialog open={isDeleteConfirmationOpen} onOpenChange={setIsDeleteConfirmationOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Confirmar Exclusão</DialogTitle>
-                        </DialogHeader>
-                        <p>Tem certeza de que deseja excluir esta bagagem?</p>
-                        <div className="flex justify-end space-x-2 mt-4">
-                            <Button variant="outline" onClick={cancelDeleteBaggage}>
-                                Cancelar
-                            </Button>
-                            <Button variant="destructive" onClick={confirmDeleteBaggage}>
-                                Excluir
-                            </Button>
-                        </div>
                     </DialogContent>
                 </Dialog>
             </div>
