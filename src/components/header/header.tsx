@@ -1,8 +1,6 @@
 import * as React from "react";
 import { Button } from "../ui/button";
 import { Link, NavLink } from "react-router-dom";
-import { CircleUserRound } from "lucide-react";
-import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar";
 
 interface HeaderProps {
   userLoggedIn: boolean;
@@ -30,7 +28,7 @@ const Header: React.FC<HeaderProps> = ({ userLoggedIn }) => {
       }
 
       {userLoggedIn ? (
-        <Link to="../">
+        <Link to="../profile">
           <Button>Configurações</Button>
         </Link>
       ) : (

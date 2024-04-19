@@ -6,6 +6,7 @@ import ProtectedRoute from './ProtectedRoute';
 import { FlightPage } from '@/pages/flights/flight';
 import { BaggagesPage } from '@/pages/baggages/baggages';
 import { UsersPage } from '@/pages/users/users';
+import { UserProfile } from '@/pages/configuration/config';
 
 const router = createBrowserRouter([
  {
@@ -31,6 +32,10 @@ const router = createBrowserRouter([
       {
         path: '/users',
         element: <ProtectedRoute element={<UsersPage />} redirectTo="/" />
+      },
+      {
+        path: '/profile',
+        element: <ProtectedRoute element={<UserProfile />} redirectTo="/" />
       }
     ]
  }
