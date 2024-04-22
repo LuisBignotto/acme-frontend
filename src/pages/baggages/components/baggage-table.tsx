@@ -13,11 +13,10 @@ interface PrintQRCodeProps {
 }
 
 const PrintQRCode = React.forwardRef<HTMLDivElement, PrintQRCodeProps>(({ src }, ref: ForwardedRef<HTMLDivElement>) => (
-    <div ref={ref}>
-        <img src={src} alt="QR Code" className='w-8/12'/>
+    <div ref={ref} className="flex justify-center items-center min-h-[300px]">
+        <img src={src} alt="QR Code" className="w-8/12"/>
     </div>
 ));
-
 
 const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit }) => {
     const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
