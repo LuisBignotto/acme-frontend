@@ -7,16 +7,7 @@ import { Pencil, Trash2, QrCode } from 'lucide-react';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
 import { getQrCode } from '@/services/baggage-service/baggageService';
 import { useReactToPrint } from 'react-to-print';
-
-interface PrintQRCodeProps {
-    src: string;
-}
-
-const PrintQRCode = React.forwardRef<HTMLDivElement, PrintQRCodeProps>(({ src }, ref: ForwardedRef<HTMLDivElement>) => (
-    <div ref={ref} className="flex justify-center items-center min-h-[300px]">
-        <img src={src} alt="QR Code" className="w-8/12"/>
-    </div>
-));
+import { PrintQRCode } from './print-qrcode';
 
 const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit }) => {
     const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
