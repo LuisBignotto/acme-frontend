@@ -87,3 +87,12 @@ export const deleteUserBaggage = async (baggageId: string) => {
         throw error;
     }
 };
+
+export const getQrCode = async (baggageId: string): Promise<string> => {
+    try {
+        const response = await api.get(`/qrcode?id=${baggageId}`, { responseType: 'blob' });
+        return URL.createObjectURL(response.data);
+    } catch (error) {
+        throw error;
+    }
+};

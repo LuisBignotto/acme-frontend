@@ -1,11 +1,43 @@
-import React from 'react';
+import React, { useRef, useState, FC, ForwardedRef } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
 import { BaggageTableProps } from '@/interfaces/baggage-interfaces/BaggageTableProps';
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil, Trash2, QrCode } from 'lucide-react';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { getQrCode } from '@/services/baggage-service/baggageService';
+import { useReactToPrint } from 'react-to-print';
+
+interface PrintQRCodeProps {
+    src: string;
+}
+
+const PrintQRCode = React.forwardRef<HTMLDivElement, PrintQRCodeProps>(({ src }, ref: ForwardedRef<HTMLDivElement>) => (
+    <div ref={ref}>
+        <img src={src} alt="QR Code" className='w-8/12'/>
+    </div>
+));
+
 
 const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit }) => {
+    const [qrCodeUrl, setQrCodeUrl] = useState<string>('');
+    const [isDialogOpen, setIsDialogOpen] = useState<boolean>(false);
+    const printRef = useRef<HTMLDivElement>(null);
+
+    const handlePrint = useReactToPrint({
+        content: () => printRef.current,
+    });
+
+    const handleQrCodeClick = async (baggageId: string) => {
+        try {
+            const url = await getQrCode(baggageId);
+            setQrCodeUrl(url);
+            setIsDialogOpen(true);
+        } catch (error) {
+            console.error('Failed to load QR Code:', error);
+        }
+    };
+
     return (
         <Table className="rounded-lg overflow-hidden min-w-screen-md shadow-lg min-w-6xl">
             <TableHeader className="bg-gray-100">
@@ -36,7 +68,25 @@ const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit 
                                     <Pencil size={22} />
                                 </Button>
                             )}
-                            <div>
+                            <div className='flex space-x-1'>
+                                <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button onClick={() => handleQrCodeClick(baggage.id)}>
+                                            <QrCode />
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent>
+                                        <DialogHeader>
+                                            <DialogTitle>Imprimir QR Code</DialogTitle>
+                                        </DialogHeader>
+                                        <PrintQRCode ref={printRef} src={qrCodeUrl} />
+                                        <DialogFooter>
+                                            <DialogClose asChild>
+                                                <Button onClick={handlePrint}>Imprimir</Button>
+                                            </DialogClose>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
                                 <AlertDialog>
                                     <AlertDialogTrigger asChild>
                                         <Button className="bg-red-700 hover:bg-red-600">
