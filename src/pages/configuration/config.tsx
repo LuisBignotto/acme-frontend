@@ -49,6 +49,11 @@ export function UserProfile() {
         }));
     };
 
+    const handleLogout = () => {
+        localStorage.removeItem('authToken');
+        window.location.href = '/';
+    };
+
     const handleSave = async () => {
         if (newPassword && currentPassword) {
             if (newPassword === currentPassword) {
@@ -196,8 +201,9 @@ export function UserProfile() {
                             />
                         </div>
                     </div>
-                    <div className='mt-2'>
+                    <div className='mt-2 flex space-x-1'>
                         <Button onClick={handleSave}>Salvar</Button>
+                        <Button onClick={handleLogout} variant='destructive'>Sair</Button>
                     </div>
                 </div>
             </div>
