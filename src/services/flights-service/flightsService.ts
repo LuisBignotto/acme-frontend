@@ -1,5 +1,5 @@
 import api from '../api';
-import { flightData } from '@/interfaces/flight-interfaces/flightData';
+import { FlightData } from '@/interfaces/flight-interfaces/flightData';
 
 // Função para obter uma lista de voos com paginação e ordenação
 export const getFlights = async (page = 0, size = 10, sort = 'departureDate') => {
@@ -14,8 +14,8 @@ export const getFlights = async (page = 0, size = 10, sort = 'departureDate') =>
 // Função para obter detalhes de um voo específico pelo ID
 export const getFlight = async (flightId: string) => {
     try {
-        const response = await api.get(`/flight-ms/flights/${flightId}`);
-        return response.data;
+        const response = await api.get(`/flight-ms/flights/id/${flightId}`);
+        return response;
     } catch (error) {
         throw error;
     }
@@ -41,7 +41,7 @@ export const deleteFlight = async (flightId: string) => {
 };
 
 // Função para criar um novo voo
-export const createFlight = async (flightData: flightData) => {
+export const createFlight = async (flightData: FlightData) => {
     try {
         const response = await api.post('/flight-ms/flights', flightData);
         return response.data;

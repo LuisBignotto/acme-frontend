@@ -30,6 +30,16 @@ export const getBaggageByTag = async (baggageTag: string) => {
     }
 };
 
+// Função para obter bagagem por tag
+export const getBaggagesByEmail = async (baggageTag: string) => {
+    try {
+        const response = await api.get(`/baggage-ms/baggages/tag/${baggageTag}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Função para adicionar bagagem a um usuário (ajustar conforme necessário)
 export const addBaggageToUser = async (baggageData: any) => {
     try {
@@ -70,11 +80,11 @@ export const deleteBaggage = async (baggageId: string) => {
 };
 
 // Função para obter QR Code de uma bagagem (ajustar conforme necessário)
-// export const getQrCode = async (baggageId: string): Promise<string> => {
-//     try {
-//         const response = await api.get(`/baggage-ms/qrcode?id=${baggageId}`, { responseType: 'blob' });
-//         return URL.createObjectURL(response.data);
-//     } catch (error) {
-//         throw error;
-//     }
-// };
+export const getQrCode = async (baggageId: string): Promise<string> => {
+    try {
+        const response = await api.get(`/baggage-ms/qrcode?id=${baggageId}`, { responseType: 'blob' });
+        return URL.createObjectURL(response.data);
+    } catch (error) {
+        throw error;
+    }
+};

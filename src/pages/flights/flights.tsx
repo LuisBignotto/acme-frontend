@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { deleteFlight, getFlightByTag, getFlights } from "@/services/flights-service/flightsService";
+import { useEffect, useReducer } from "react";
+import { deleteFlight, getFlightByTag, getFlights, getFlight } from "@/services/flights-service/flightsService";
 import { Flight } from "@/interfaces/flight-interfaces/FlightInterfaces";
 import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
@@ -10,39 +10,92 @@ import { useToast } from "@/components/ui/use-toast";
 import { useNavigate } from 'react-router-dom';
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { CreateFlightForm } from "./components/create";
+import { UpdateFlightForm } from "./components/update";
 import { SearchFlightForm } from "./components/search-flight-form";
 
+interface State {
+    flights: Flight[];
+    loading: boolean;
+    currentPage: number;
+    totalPages: number;
+    isOpen: boolean;
+    isSearchOpen: boolean;
+    isEditOpen: boolean;
+    currentFlight: Flight | null;
+}
+
+type Action =
+    | { type: 'SET_FLIGHTS'; payload: FlightsResponse }
+    | { type: 'SET_LOADING'; payload: boolean }
+    | { type: 'SET_CURRENT_PAGE'; payload: number }
+    | { type: 'SET_TOTAL_PAGES'; payload: number }
+    | { type: 'SET_IS_OPEN'; payload: boolean }
+    | { type: 'SET_IS_SEARCH_OPEN'; payload: boolean }
+    | { type: 'SET_IS_EDIT_OPEN'; payload: boolean }
+    | { type: 'SET_CURRENT_FLIGHT'; payload: Flight | null };
+
+const initialState: State = {
+    flights: [],
+    loading: true,
+    currentPage: 0,
+    totalPages: 0,
+    isOpen: false,
+    isSearchOpen: false,
+    isEditOpen: false,
+    currentFlight: null,
+};
+
+function reducer(state: State, action: Action): State {
+    switch (action.type) {
+        case 'SET_FLIGHTS':
+            return {
+                ...state,
+                flights: action.payload.content,
+                totalPages: action.payload.totalPages,
+                currentPage: action.payload.number,
+                loading: false,
+            };
+        case 'SET_LOADING':
+            return { ...state, loading: action.payload };
+        case 'SET_CURRENT_PAGE':
+            return { ...state, currentPage: action.payload };
+        case 'SET_TOTAL_PAGES':
+            return { ...state, totalPages: action.payload };
+        case 'SET_IS_OPEN':
+            return { ...state, isOpen: action.payload };
+        case 'SET_IS_SEARCH_OPEN':
+            return { ...state, isSearchOpen: action.payload };
+        case 'SET_IS_EDIT_OPEN':
+            return { ...state, isEditOpen: action.payload };
+        case 'SET_CURRENT_FLIGHT':
+            return { ...state, currentFlight: action.payload };
+        default:
+            return state;
+    }
+}
+
 export function FlightsPage() {
-    const [flights, setFlights] = useState<Flight[]>([]);
-    const [loading, setLoading] = useState<boolean>(true);
-    const [currentPage, setCurrentPage] = useState<number>(0);
-    const [totalPages, setTotalPages] = useState<number>(0);
-    const [isOpen, setIsOpen] = useState(false);
-    const [isSearchOpen, setIsSearchOpen] = useState(false);
+    const [state, dispatch] = useReducer(reducer, initialState);
     const navigate = useNavigate();
-    const { toast } = useToast()
+    const { toast } = useToast();
 
     const fetchFlights = async () => {
-        setLoading(true);
+        dispatch({ type: 'SET_LOADING', payload: true });
         try {
-            const data: FlightsResponse = await getFlights(currentPage);
-            setFlights(data.content);
-            setTotalPages(data.totalPages);
-            setCurrentPage(data.number);
+            const data: FlightsResponse = await getFlights(state.currentPage);
+            dispatch({ type: 'SET_FLIGHTS', payload: data });
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Falha ao buscar voos!",
                 description: "Entre novamente para ver voos.",
-            })
-        } finally {
-            setLoading(false);
+            });
         }
     };
 
     useEffect(() => {
         fetchFlights();
-    }, [currentPage]);
+    }, [state.currentPage]);
 
     const handleDeleteFlight = async (id: string) => {
         try {
@@ -51,26 +104,25 @@ export function FlightsPage() {
             toast({
                 variant: "success",
                 title: "Voo apagado com sucesso!",
-            })
+            });
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Erro ao deletar voo!",
                 description: "Ainda há bagagens nesse voo.",
-            })
+            });
         }
     };
 
     const handlePageChange = (newPage: number) => {
-        setCurrentPage(newPage);
+        dispatch({ type: 'SET_CURRENT_PAGE', payload: newPage });
     };
 
     const handleSearch = async (searchTerm: string) => {
         try {
             const flight = await getFlightByTag(searchTerm);
-
             if (flight) {
-                navigate(`/flights/${flight.data.id}`);
+                navigate(`/flights/${flight.id}`);
             }
         } catch (error) {
             toast({
@@ -79,10 +131,24 @@ export function FlightsPage() {
                 description: "Nenhum voo encontrado com a tag fornecida.",
             });
         }
-        setIsSearchOpen(false);
+        dispatch({ type: 'SET_IS_SEARCH_OPEN', payload: false });
     };
 
-    if (loading) {
+    const handleEditFlight = async (id: string) => {
+        try {
+            const response = await getFlight(id);
+            dispatch({ type: 'SET_CURRENT_FLIGHT', payload: response.data });
+            dispatch({ type: 'SET_IS_EDIT_OPEN', payload: true });
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Erro ao buscar voo!",
+                description: "Não foi possível buscar os detalhes do voo.",
+            });
+        }
+    };
+
+    if (state.loading) {
         return (
             <div className="flex items-center justify-center h-full flex-grow overflow-auto py-12 px-12">
                 <LoaderCircle size={64} className="animate-spin text-darkblue" />
@@ -93,7 +159,7 @@ export function FlightsPage() {
     return (
         <div className="flex-grow overflow-auto py-12 px-12">
             <div className="mb-4 flex space-x-1">
-                <Dialog open={isOpen} onOpenChange={setIsOpen}>
+                <Dialog open={state.isOpen} onOpenChange={(isOpen) => dispatch({ type: 'SET_IS_OPEN', payload: isOpen })}>
                     <DialogTrigger asChild>
                         <Button>
                             Criar Voo
@@ -103,10 +169,10 @@ export function FlightsPage() {
                         <DialogHeader>
                             <DialogTitle>Criar Novo Voo</DialogTitle>
                         </DialogHeader>
-                        <CreateFlightForm onClose={() => setIsOpen(false)} />
+                        <CreateFlightForm onClose={() => dispatch({ type: 'SET_IS_OPEN', payload: false })} />
                     </DialogContent>
                 </Dialog>
-                <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+                <Dialog open={state.isSearchOpen} onOpenChange={(isSearchOpen) => dispatch({ type: 'SET_IS_SEARCH_OPEN', payload: isSearchOpen })}>
                     <DialogTrigger asChild>
                         <Button>
                             Buscar Voo
@@ -120,10 +186,20 @@ export function FlightsPage() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <FlightTable flights={flights} onDelete={handleDeleteFlight} />
+            <FlightTable flights={state.flights} onDelete={handleDeleteFlight} onEdit={handleEditFlight} />
             <div className="mt-6 flex justify-center">
-                <PaginationComponent currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+                <PaginationComponent currentPage={state.currentPage} totalPages={state.totalPages} onPageChange={handlePageChange} />
             </div>
+            <Dialog open={state.isEditOpen} onOpenChange={(isEditOpen) => dispatch({ type: 'SET_IS_EDIT_OPEN', payload: isEditOpen })}>
+                <DialogContent>
+                    <DialogHeader>
+                        <DialogTitle>Editar Voo</DialogTitle>
+                    </DialogHeader>
+                    {state.currentFlight && (
+                        <UpdateFlightForm flightId={state.currentFlight.id} onClose={() => dispatch({ type: 'SET_IS_EDIT_OPEN', payload: false })} />
+                    )}
+                </DialogContent>
+            </Dialog>
         </div>
     );
 }

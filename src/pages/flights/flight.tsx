@@ -5,10 +5,10 @@ import { useToast } from "@/components/ui/use-toast";
 import { getFlight } from "@/services/flights-service/flightsService";
 import { createBaggage, deleteBaggage } from "@/services/baggage-service/baggageService";
 import { Baggages } from "@/interfaces/baggage-interfaces/Baggages";
-import BagageTable from "../baggages/components/baggage-table";
+import BaggageTable from "../baggages/components/baggage-table";
 import { Button } from "@/components/ui/button";
 import SelectStatus from '../baggages/components/select-status';
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogClose } from '@/components/ui/dialog';
+import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog';
 import { BaggageFormState } from "@/interfaces/baggage-interfaces/BaggageFormState";
 import { Label } from "@/components/ui/label";
 import FormField from "@/components/form-field/form-field";
@@ -40,7 +40,7 @@ export function FlightPage() {
         isValid: true,
     });
     const { flightId } = useParams<{ flightId: string }>();
-    const { toast } = useToast()
+    const { toast } = useToast();
 
     const fetchFlight = async () => {
         setLoading(true);
@@ -48,14 +48,15 @@ export function FlightPage() {
             if (!flightId) {
                 throw new Error("ID do voo não especificado.");
             }
-            const data = await getFlight(flightId);
-            setBaggages(data.baggage);
+            const response = await getFlight(flightId);
+            const data = response.data;
+            setBaggages(data.baggages || []);
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Falha ao buscar as bagagens do voo!",
                 description: "Ocorreu um erro ao buscar os voos.",
-            })
+            });
         } finally {
             setLoading(false);
         }
@@ -93,22 +94,21 @@ export function FlightPage() {
                 flightId,
             };
 
-            await createBaggage(baggageData)
-                .then((newBaggage) => {
-                    toast({
-                        variant: "success",
-                        title: "Bagagem criada com sucesso!",
-                    });
-                    setBaggages([...baggages, newBaggage]);
-                    setIsOpen(false);
-                })
-                .catch(() => {
-                    toast({
-                        variant: "destructive",
-                        title: "Erro ao criar bagagem!",
-                    });
-                    setState({ ...state, isValid: false });
+            try {
+                const newBaggage = await createBaggage(baggageData);
+                toast({
+                    variant: "success",
+                    title: "Bagagem criada com sucesso!",
                 });
+                setBaggages([...baggages, newBaggage]);
+                setIsOpen(false);
+            } catch (error) {
+                toast({
+                    variant: "destructive",
+                    title: "Erro ao criar bagagem!",
+                });
+                setState({ ...state, isValid: false });
+            }
         }
     };
 
@@ -119,12 +119,12 @@ export function FlightPage() {
             toast({
                 variant: "success",
                 title: "Bagagem apagada com sucesso!",
-            })
+            });
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Erro ao apagar bagagem!",
-            })
+            });
         }
     };
 
@@ -170,8 +170,6 @@ export function FlightPage() {
                                                 onChange={(value) => handleChange(field, value)}
                                                 type={'text'}
                                                 placeholder={fieldLabels[field]}
-                                                placeholderHour={""}
-                                                placeholderMinute={""}
                                             />
                                         )}
                                     </div>
@@ -184,7 +182,7 @@ export function FlightPage() {
                     </DialogContent>
                 </Dialog>
             </div>
-            <BagageTable baggages={baggages} onDelete={handleDeleteBaggage} />
+            <BaggageTable baggages={baggages} onDelete={handleDeleteBaggage} />
         </div>
     );
 }
