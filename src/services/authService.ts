@@ -8,7 +8,6 @@ export const logout = (): void => {
     localStorage.removeItem('authToken');
 };
 
-
 api.interceptors.request.use(config => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -22,7 +21,7 @@ api.interceptors.request.use(config => {
 export const login = async (email: string, password: string) => {
     try {
         localStorage.removeItem('authToken');
-        const response = await api.post('/login', { email, password });
+        const response = await api.post('/user-ms/users/login', { email, password });
         return response.data;
     } catch (error) {
         console.error('Erro ao fazer login:', error);
