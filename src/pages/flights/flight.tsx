@@ -2,8 +2,7 @@ import { FormEvent, useEffect, useState } from "react";
 import { useParams } from 'react-router-dom';
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { getFlight } from "@/services/flights-service/flightsService";
-import { createBaggage, deleteBaggage } from "@/services/baggage-service/baggageService";
+import { getBaggagesByFlight, createBaggage, deleteBaggage } from "@/services/baggage-service/baggageService";
 import { Baggages } from "@/interfaces/baggage-interfaces/Baggages";
 import BaggageTable from "../baggages/components/baggage-table";
 import { Button } from "@/components/ui/button";
@@ -42,20 +41,19 @@ export function FlightPage() {
     const { flightId } = useParams<{ flightId: string }>();
     const { toast } = useToast();
 
-    const fetchFlight = async () => {
+    const fetchBaggages = async () => {
         setLoading(true);
         try {
             if (!flightId) {
                 throw new Error("ID do voo não especificado.");
             }
-            const response = await getFlight(flightId);
-            const data = response.data;
-            setBaggages(data.baggages || []);
+            const response = await getBaggagesByFlight(flightId);
+            setBaggages(response || []);
         } catch (error) {
             toast({
                 variant: "destructive",
                 title: "Falha ao buscar as bagagens do voo!",
-                description: "Ocorreu um erro ao buscar os voos.",
+                description: "Ocorreu um erro ao buscar as bagagens.",
             });
         } finally {
             setLoading(false);
@@ -63,7 +61,7 @@ export function FlightPage() {
     };
 
     useEffect(() => {
-        fetchFlight();
+        fetchBaggages();
     }, [flightId]);
 
     const handleChange = (field: keyof Omit<BaggageFormState, 'tag' | 'flightId'>, value: string) => {
@@ -91,7 +89,7 @@ export function FlightPage() {
                 weight: parseFloat(state.weight),
                 status: state.status,
                 lastSeenLocation: state.lastSeenLocation,
-                flightId,
+                flightId: parseInt(flightId, 10), // Convertendo flightId para número
             };
 
             try {
@@ -112,10 +110,10 @@ export function FlightPage() {
         }
     };
 
-    const handleDeleteBaggage = async (id: string) => {
+    const handleDeleteBaggage = async (id: number) => {
         try {
             await deleteBaggage(id);
-            await fetchFlight();
+            await fetchBaggages();
             toast({
                 variant: "success",
                 title: "Bagagem apagada com sucesso!",

@@ -30,20 +30,30 @@ export const getBaggageByTag = async (baggageTag: string) => {
     }
 };
 
-// Função para obter bagagem por tag
-export const getBaggagesByEmail = async (baggageTag: string) => {
+// Função para obter bagagens por email do usuário
+export const getBaggagesByEmail = async (userEmail: string) => {
     try {
-        const response = await api.get(`/baggage-ms/baggages/tag/${baggageTag}`);
+        const response = await api.get(`/baggage-ms/baggages/user/${userEmail}`);
         return response.data;
     } catch (error) {
         throw error;
     }
 };
 
-// Função para adicionar bagagem a um usuário (ajustar conforme necessário)
-export const addBaggageToUser = async (baggageData: any) => {
+// Função para obter bagagens por voo
+export const getBaggagesByFlight = async (flightId: string) => {
     try {
-        const response = await api.post("/baggage-ms/baggages", baggageData);
+        const response = await api.get(`/baggage-ms/baggages/flight/${flightId}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
+// Função para obter bagagens por rastreador
+export const getBaggagesByTracker = async (trackerId: string) => {
+    try {
+        const response = await api.get(`/baggage-ms/baggages/tracker/${trackerId}`);
         return response.data;
     } catch (error) {
         throw error;
@@ -71,7 +81,7 @@ export const updateBaggage = async (baggageId: string, baggageData: any) => {
 };
 
 // Função para deletar uma bagagem pelo ID
-export const deleteBaggage = async (baggageId: string) => {
+export const deleteBaggage = async (baggageId: number) => {
     try {
         await api.delete(`/baggage-ms/baggages/${baggageId}`);
     } catch (error) {

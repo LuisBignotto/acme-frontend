@@ -1,10 +1,14 @@
+import { Status } from "./Status";
+import { Tracker } from "./Tracker";
+
 export interface Baggages {
-    id: string;
-    userId: string;
+    id: number;
+    userId: number;
     tag: string;
     color: string;
     weight: number;
-    status: string;
-    lastSeenLocation: string;
-    flightId: string;
+    status: Status;
+    lastLocation: string;
+    flightId: number;
+    trackers: Tracker[];
 }

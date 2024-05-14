@@ -2,6 +2,6 @@ import { Baggages } from "./Baggages";
 
 export interface BaggageTableProps {
     baggages: Baggages[];
-    onDelete: (id: string) => void; 
+    onDelete: (id: number) => void; 
     onEdit?: (baggage: Baggages) => void; 
 }
