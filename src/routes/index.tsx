@@ -24,11 +24,11 @@ const router = createBrowserRouter([
       {
         path: '/flights/:flightId',
         element: <ProtectedRoute element={<FlightPage />} redirectTo="/" />
+      },
+      {
+        path: '/baggages',
+        element: <ProtectedRoute element={<BaggagesPage />} redirectTo="/" />
       }
-      // {
-      //   path: '/baggages',
-      //   element: <ProtectedRoute element={<BaggagesPage />} redirectTo="/" />
-      // },
       // {
       //   path: '/users',
       //   element: <ProtectedRoute element={<UsersPage />} redirectTo="/" />
