@@ -33,10 +33,10 @@ const router = createBrowserRouter([
         path: '/users',
         element: <ProtectedRoute element={<UsersPage />} redirectTo="/" />
       },
-      // {
-      //   path: '/profile',
-      //   element: <ProtectedRoute element={<UserProfile />} redirectTo="/" />
-      // }
+      {
+        path: '/profile',
+        element: <ProtectedRoute element={<UserProfile />} redirectTo="/" />
+      }
     ]
  }
 ]);

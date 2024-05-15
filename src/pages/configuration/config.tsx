@@ -3,7 +3,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { getUser, updateUser } from '@/services/user-service/userService';
+import { getUserInfo, updateUser } from '@/services/user-service/userService';
 import { useToast } from '@/components/ui/use-toast';
 import { User } from '@/interfaces/user-interfaces/user';
 import { Address } from '@/interfaces/user-interfaces/address';
@@ -20,8 +20,8 @@ export function UserProfile() {
     useEffect(() => {
         const fetchUser = async () => {
             try {
-                const response = await getUser();
-                setUser(response.user);
+                const response = await getUserInfo();
+                setUser(response);
             } catch (error) {
                 setError('Erro ao buscar os dados do usuário.');
             } finally {
@@ -83,10 +83,10 @@ export function UserProfile() {
                 currentPassword: currentPassword || undefined,
                 phone: user?.phone,
                 address: user?.address,
-                role: user?.role
+                roles: user?.roles
             };
 
-            const updatedUser = await updateUser(updateData);
+            const updatedUser = await updateUser(user?.id as number, updateData);
             setUser(updatedUser);
             toast({
                 title: 'Sucesso',
@@ -131,20 +131,6 @@ export function UserProfile() {
                 <div>
                     <Label htmlFor="email">Email:</Label>
                     <Input id="email" type="email" value={user?.email || ''} onChange={(e) => handleChange('email', e.target.value)} />
-                </div>
-                <div>
-                    <Label htmlFor="role">Função:</Label>
-                    <Select value={user?.role || ''} onValueChange={(value) => handleChange('role', value)} disabled >
-                        <SelectTrigger>
-                            <SelectValue placeholder="Selecione a função" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            <SelectItem value="ADMINISTRATOR">Administrador</SelectItem>
-                            <SelectItem value="REGULAR_USER">Usuário Regular</SelectItem>
-                            <SelectItem value="BAGGAGE_MANAGER">Gerente de Bagagem</SelectItem>
-                            <SelectItem value="SUPPORT">Suporte</SelectItem>
-                        </SelectContent>
-                    </Select>
                 </div>
                 <div className="sm:col-span-3">
                     <h2 className="text-xl font-semibold mb-4">Endereço</h2>
