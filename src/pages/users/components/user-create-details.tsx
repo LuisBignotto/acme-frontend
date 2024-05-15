@@ -2,22 +2,37 @@ import React, { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { UserRegister } from '@/interfaces/user-interfaces/user-register';
 import { UserCreateDetailsProps } from '@/interfaces/user-interfaces/user-create-props';
 
+const roles = [
+    { value: "ROLE_ADMIN", label: "Administrador" },
+    { value: "ROLE_USER", label: "Usuário" },
+    { value: "ROLE_BAGGAGE_MANAGER", label: "Gerente de Bagagem" },
+    { value: "ROLE_SUPPORT", label: "Suporte" }
+];
+
 const UserCreateDetails: React.FC<UserCreateDetailsProps> = ({ onSave }) => {
     const [newUser, setNewUser] = useState<UserRegister>({
-        id: '',
+        id: 0,
         name: '',
         email: '',
         cpf: '',
         password: '',
-        role: '',
+        roles: [],
     });
 
     const handleChange = (field: keyof UserRegister, value: string) => {
         setNewUser({ ...newUser, [field]: value });
+    };
+
+    const handleRoleChange = (role: string) => {
+        setNewUser({
+            ...newUser,
+            roles: newUser.roles.includes(role)
+                ? newUser.roles.filter(r => r !== role)
+                : [...newUser.roles, role]
+        });
     };
 
     const handleSave = () => {
@@ -43,18 +58,21 @@ const UserCreateDetails: React.FC<UserCreateDetailsProps> = ({ onSave }) => {
                 <Input id="password" type="password" value={newUser.password} onChange={(e) => handleChange('password', e.target.value)} />
             </div>
             <div className="sm:col-span-2">
-                <Label htmlFor="role">Função:</Label>
-                <Select value={newUser.role} onValueChange={(value) => handleChange('role', value)}>
-                    <SelectTrigger>
-                        <SelectValue placeholder="Selecione a função" />
-                    </SelectTrigger>
-                    <SelectContent>
-                        <SelectItem value="ADMINISTRATOR">Administrador</SelectItem>
-                        <SelectItem value="REGULAR_USER">Usuário Regular</SelectItem>
-                        <SelectItem value="BAGGAGE_MANAGER">Gerente de Bagagem</SelectItem>
-                        <SelectItem value="SUPPORT">Suporte</SelectItem>
-                    </SelectContent>
-                </Select>
+                <Label>Funções:</Label>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                    {roles.map((role) => (
+                        <div key={role.value}>
+                            <label className="flex items-center space-x-2">
+                                <input
+                                    type="checkbox"
+                                    checked={newUser.roles.includes(role.value)}
+                                    onChange={() => handleRoleChange(role.value)}
+                                />
+                                <span>{role.label}</span>
+                            </label>
+                        </div>
+                    ))}
+                </div>
             </div>
             <div className="sm:col-span-2 flex justify-end">
                 <Button onClick={handleSave}>Salvar</Button>

@@ -6,13 +6,13 @@ import { UserTableProps } from "@/interfaces/user-interfaces/user-table-props";
 
 const getRoleLabel = (role: string) => {
     switch (role) {
-        case "ADMINISTRATOR":
+        case "ROLE_ADMIN":
             return "Administrador";
-        case "REGULAR_USER":
+        case "ROLE_USER":
             return "Usuário Regular";
-        case "BAGGAGE_MANAGER":
+        case "ROLE_BAGGAGE_MANAGER":
             return "Gerente de Bagagem";
-        case "SUPPORT":
+        case "ROLE_SUPPORT":
             return "Suporte";
         default:
             return role;
@@ -24,11 +24,12 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
         <Table>
             <TableHeader>
                 <TableRow>
+                    <TableHead>ID</TableHead>
                     <TableHead>Nome</TableHead>
                     <TableHead>Email</TableHead>
                     <TableHead>CPF</TableHead>
                     <TableHead>Telefone</TableHead>
-                    <TableHead>Função</TableHead>
+                    <TableHead>Funções</TableHead>
                     <TableHead>Endereço</TableHead>
                     <TableHead>Ações</TableHead>
                 </TableRow>
@@ -36,11 +37,16 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
             <TableBody>
                 {users.map((user) => (
                     <TableRow key={user.id}>
+                        <TableCell>{user.id}</TableCell>
                         <TableCell>{user.name}</TableCell>
                         <TableCell>{user.email}</TableCell>
                         <TableCell>{user.cpf}</TableCell>
                         <TableCell>{user.phone || "-"}</TableCell>
-                        <TableCell>{getRoleLabel(user.role)}</TableCell>
+                        <TableCell>
+                            {user.roles.map((role) => (
+                                <div key={role}>{getRoleLabel(role)}</div>
+                            ))}
+                        </TableCell>
                         <TableCell>
                             {user.address ? (
                                 <div>
@@ -65,14 +71,13 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
                                         <Button
                                             variant="destructive"
                                             size="sm"
-
                                         >
                                             <Trash2 />
                                         </Button>
                                     </AlertDialogTrigger>
                                     <AlertDialogContent>
                                         <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                                        <AlertDialogDescription>Tem certeza de que deseja excluir este voo?</AlertDialogDescription>
+                                        <AlertDialogDescription>Tem certeza de que deseja excluir este usuário?</AlertDialogDescription>
                                         <AlertDialogFooter>
                                             <AlertDialogCancel>Cancelar</AlertDialogCancel>
                                             <AlertDialogAction onClick={() => onDelete(user.id)}>Confirmar</AlertDialogAction>

@@ -10,6 +10,16 @@ export const getUserByEmail = async (email: string) => {
     }
 };
 
+// Função para buscar todos usuários
+export const getAllUsers = async (page = 0, size = 10, sort = 'id') => {
+    try {
+        const response = await api.get(`/user-ms/users?page=${page}&size=${size}&sort=${sort}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Função para atualizar um usuário
 export const updateUser = async (userId: number, userData: any) => {
     try {
@@ -49,10 +59,20 @@ export const addRoleToUser = async (userId: number, role: string) => {
     }
 };
 
+// Função para remover cargo de um usuário
+export const removeRoleFromUser = async (userId: number, role: string) => {
+    try {
+        const response = await api.delete(`/user-ms/users/${userId}/roles/${role}`);
+        return response.data;
+    } catch (error) {
+        throw error;
+    }
+};
+
 // Função para buscar informações do usuário autenticado
 export const getUserInfo = async () => {
     try {
-        const response = await api.get("/user-ms/users");
+        const response = await api.get("/user-ms/users/me");
         return response.data;
     } catch (error) {
         throw error;

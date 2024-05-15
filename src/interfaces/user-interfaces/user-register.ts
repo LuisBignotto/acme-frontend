@@ -1,8 +1,8 @@
 export interface UserRegister {
-    id: string;
+    id: number;
     name: string;
     email: string;
     cpf: string;
     password: string;
-    role: string;
+    roles: string[];
 }
