@@ -1,4 +1,5 @@
 import api from "../api";
+import { getUserByEmail } from "../user-service/userService";
 
 // Função para obter uma bagagem específica pelo ID
 export const getBaggage = async (baggageId: string) => {
@@ -14,7 +15,7 @@ export const getBaggage = async (baggageId: string) => {
 export const getAllBaggages = async () => {
     try {
         const response = await api.get("/baggage-ms/baggages");
-        return response.data;
+        return response.data.content;
     } catch (error) {
         throw error;
     }
@@ -33,12 +34,15 @@ export const getBaggageByTag = async (baggageTag: string) => {
 // Função para obter bagagens por email do usuário
 export const getBaggagesByEmail = async (userEmail: string) => {
     try {
-        const response = await api.get(`/baggage-ms/baggages/user/${userEmail}`);
-        return response.data;
+        const user = await getUserByEmail(userEmail);
+        const response = await api.get(`/baggage-ms/baggages/user/${user.id}`);
+        return response;
     } catch (error) {
+        console.error('Error fetching baggages by email:', error);
         throw error;
     }
 };
+
 
 // Função para obter bagagens por voo
 export const getBaggagesByFlight = async (flightId: string) => {

@@ -2,11 +2,11 @@ import React, { useState, FormEvent } from 'react';
 import { Button } from "@/components/ui/button";
 import FormField from '@/components/form-field/form-field';
 
-interface SearchBaggageByEmail {
+interface SearchBaggageByEmailProps {
     onSearch: (searchTerm: string) => void;
 }
 
-export const SearchBaggageByEmail: React.FC<SearchBaggageByEmail> = ({ onSearch }) => {
+export const SearchBaggageByEmail: React.FC<SearchBaggageByEmailProps> = ({ onSearch }) => {
     const [searchTerm, setSearchTerm] = useState<string>('');
 
     const handleSubmit = (e: FormEvent<HTMLFormElement>) => {

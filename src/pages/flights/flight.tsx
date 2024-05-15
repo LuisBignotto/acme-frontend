@@ -95,7 +95,7 @@ export function FlightPage() {
                         <DialogHeader>
                             <DialogTitle>Criar Nova Bagagem</DialogTitle>
                         </DialogHeader>
-                        <BaggageCreateDetails onSave={handleSaveBaggage} />
+                        <BaggageCreateDetails onSave={handleSaveBaggage} showFlightId={false} />
                     </DialogContent>
                 </Dialog>
             </div>

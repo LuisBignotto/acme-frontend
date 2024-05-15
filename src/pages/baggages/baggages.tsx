@@ -14,6 +14,7 @@ import BaggageCreateDetails from "./components/baggage-create";
 import { getUserByEmail } from "@/services/user-service/userService";
 import { BaggageFormState } from "@/interfaces/baggage-interfaces/BaggageFormState";
 import BaggageSearchResults from "./components/baggage-list";
+import PaginationComponent from "@/components/pagination/pagination-comp";
 
 export function BaggagesPage() {
     const [baggages, setBaggages] = useState<Baggages[]>([]);
@@ -25,7 +26,9 @@ export function BaggagesPage() {
     const [isBaggageDetailsOpen, setIsBaggageDetailsOpen] = useState(false);
     const [foundBaggagesByEmail, setFoundBaggagesByEmail] = useState<Baggages[]>([]);
     const [isEditBaggageOpen, setIsEditBaggageOpen] = useState(false);
-    const [baggageToDelete, setBaggageToDelete] = useState<string | null>(null);
+    const [baggageToDelete, setBaggageToDelete] = useState<number | null>(null);
+    const [currentPage, setCurrentPage] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(1);
 
     const { toast } = useToast();
 
@@ -33,7 +36,7 @@ export function BaggagesPage() {
         const fetchBaggages = async () => {
             try {
                 const data = await getAllBaggages();
-                setBaggages(data);
+                setBaggages(Array.isArray(data) ? data : []);
                 setLoading(false);
             } catch (error) {
                 console.error("Erro ao buscar bagagens:", error);
@@ -42,7 +45,7 @@ export function BaggagesPage() {
         };
 
         fetchBaggages();
-    }, []);
+    }, [currentPage]);
 
     const generateTag = (): string => {
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
@@ -66,28 +69,19 @@ export function BaggagesPage() {
                 return;
             }
 
-            const userId = userResponse.data.userId;
-
-            const flightResponse = await getFlightByTag(newBaggage.flightId);
-
-            if (!flightResponse) {
-                toast({
-                    variant: "destructive",
-                    title: "Erro ao criar bagagem",
-                    description: "Voo não encontrado com a tag fornecida.",
-                });
-                return;
-            }
-
-            const flightId = flightResponse.data.id;
+            const userId = userResponse.data.id;
 
             const tag = generateTag();
 
             const baggageData = {
-                ...newBaggage,
                 userId: userId,
-                flightId: flightId,
                 tag: tag,
+                color: newBaggage.color,
+                weight: parseFloat(newBaggage.weight),
+                statusId: parseInt(newBaggage.status, 10),
+                lastLocation: newBaggage.lastSeenLocation,
+                flightId: parseInt(newBaggage.flightId, 10),
+                trackers: [],
             };
 
             const response = await createBaggage(baggageData);
@@ -109,7 +103,7 @@ export function BaggagesPage() {
         }
     };
 
-    const handleDeleteBaggage = async (baggageId: string) => {
+    const handleDeleteBaggage = async (baggageId: number) => {
         setBaggageToDelete(baggageId);
         try {
             await deleteBaggage(baggageId);
@@ -134,7 +128,7 @@ export function BaggagesPage() {
     const handleSearchByTag = async (searchTerm: string) => {
         try {
             const response = await getBaggageByTag(searchTerm);
-            const baggage: Baggages = response.data;
+            const baggage: Baggages = response;
 
             if (baggage) {
                 setFoundBaggage(baggage);
@@ -163,7 +157,7 @@ export function BaggagesPage() {
     const handleSearchByEmail = async (searchTerm: string) => {
         try {
             const baggages = await getBaggagesByEmail(searchTerm);
-            if (baggages.data.length > 0) {
+            if (baggages?.data?.length > 0) {
                 setFoundBaggagesByEmail(baggages.data);
                 setIsBaggageDetailsOpen(true);
                 toast({
@@ -183,6 +177,7 @@ export function BaggagesPage() {
                 title: "Erro ao buscar bagagens",
                 description: "Tente novamente mais tarde.",
             });
+            console.error(error);
         }
         setIsSearchByEmailOpen(false);
     };
@@ -196,7 +191,7 @@ export function BaggagesPage() {
 
     const handleUpdateBaggage = async (updatedBaggage: Baggages) => {
         try {
-            const flight = await getFlight(updatedBaggage.flightId);
+            const flight = await getFlight(updatedBaggage.flightId.toString());
             if (!flight) {
                 toast({
                     variant: "destructive",
@@ -205,8 +200,7 @@ export function BaggagesPage() {
                 });
                 return;
             }
-
-            await updateBaggage(updatedBaggage.id, updatedBaggage);
+            await updateBaggage(updatedBaggage.id.toString(), updatedBaggage);
             const updatedBaggages = baggages.map(baggage => baggage.id === updatedBaggage.id ? updatedBaggage : baggage);
             setBaggages(updatedBaggages);
             setIsBaggageDetailsOpen(false);
@@ -214,6 +208,7 @@ export function BaggagesPage() {
                 variant: "success",
                 title: "Bagagem atualizada com sucesso!",
             });
+
         } catch (error) {
             console.error("Erro ao atualizar bagagem:", error);
             toast({
@@ -221,6 +216,10 @@ export function BaggagesPage() {
                 title: "Erro ao atualizar bagagem!",
             });
         }
+    };
+
+    const handlePageChange = (page: number) => {
+        setCurrentPage(page);
     };
 
     if (loading) {
@@ -242,7 +241,7 @@ export function BaggagesPage() {
                         <DialogHeader>
                             <DialogTitle>Criar Bagagem</DialogTitle>
                         </DialogHeader>
-                        <BaggageCreateDetails onSave={handleCreateBaggage} />
+                        <BaggageCreateDetails onSave={handleCreateBaggage} showFlightId={true} />
                     </DialogContent>
                 </Dialog>
                 <Dialog open={isSearchByTagOpen} onOpenChange={setIsSearchByTagOpen}>
@@ -254,14 +253,6 @@ export function BaggagesPage() {
                             <DialogTitle>Buscar por Tag</DialogTitle>
                         </DialogHeader>
                         <SearchBaggageByTag onSearch={handleSearchByTag} />
-                    </DialogContent>
-                </Dialog>
-                <Dialog open={isEditBaggageOpen} onOpenChange={setIsEditBaggageOpen}>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Editar Bagagem</DialogTitle>
-                        </DialogHeader>
-                        {foundBaggage && <BaggageDetails onSave={handleUpdateBaggage} onDelete={handleDeleteBaggage} baggage={foundBaggage} />}
                     </DialogContent>
                 </Dialog>
                 <Dialog open={isSearchByEmailOpen} onOpenChange={setIsSearchByEmailOpen}>
@@ -287,12 +278,29 @@ export function BaggagesPage() {
                         />
                     </DialogContent>
                 </Dialog>
+                <Dialog open={isEditBaggageOpen} onOpenChange={setIsEditBaggageOpen}>
+                    <DialogContent>
+                        <DialogHeader>
+                            <DialogTitle>Editar Bagagem</DialogTitle>
+                        </DialogHeader>
+                        {foundBaggage && (
+                            <BaggageDetails
+                                onSave={handleUpdateBaggage}
+                                onDelete={handleDeleteBaggage}
+                                baggage={foundBaggage}
+                            />
+                        )}
+                    </DialogContent>
+                </Dialog>
             </div>
             <BaggageTable
                 baggages={baggages}
                 onDelete={handleDeleteBaggage}
                 onEdit={(baggage) => handleEditBaggage(baggage)}
             />
+            <div className="mt-6 flex justify-center">
+                <PaginationComponent currentPage={currentPage} totalPages={totalPages} onPageChange={handlePageChange} />
+            </div>
         </div>
     );
 }

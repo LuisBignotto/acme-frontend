@@ -10,9 +10,10 @@ import { useToast } from '@/components/ui/use-toast';
 
 interface BaggageDetailsProps {
     onSave: (newBaggage: any) => void;
+    showFlightId?: boolean;
 }
 
-const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
+const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave, showFlightId = true }) => {
     const { flightId } = useParams<{ flightId: string }>();
     const { toast } = useToast();
     const [newBaggage, setNewBaggage] = useState<BaggageFormState>({
@@ -49,7 +50,7 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
                 weight: parseFloat(newBaggage.weight),
                 statusId: parseInt(newBaggage.status, 10),
                 lastLocation: newBaggage.lastSeenLocation,
-                flightId: parseInt(flightId!, 10),
+                flightId: showFlightId ? parseInt(newBaggage.flightId, 10) : parseInt(flightId!, 10),
                 trackers: [],
             };
             console.log(baggageData);
@@ -92,10 +93,12 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
                 <Label htmlFor="lastSeenLocation">Última Localização:</Label>
                 <Input id="lastSeenLocation" value={newBaggage.lastSeenLocation} onChange={(e) => handleChange('lastSeenLocation', e.target.value)} />
             </div>
-            <div className="col-span-2">
-                <Label htmlFor="flightId">ID do Voo:</Label>
-                <Input id="flightId" value={newBaggage.flightId} onChange={(e) => handleChange('flightId', e.target.value)} disabled />
-            </div>
+            {showFlightId && (
+                <div className="col-span-2">
+                    <Label htmlFor="flightId">ID do Voo:</Label>
+                    <Input id="flightId" value={newBaggage.flightId} onChange={(e) => handleChange('flightId', e.target.value)} />
+                </div>
+            )}
             <div className="flex space-x-1">
                 <Button onClick={handleSave}>Criar</Button>
             </div>
