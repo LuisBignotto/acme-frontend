@@ -1,4 +1,4 @@
-import React, { useRef, useState, FC, ForwardedRef } from 'react';
+import React, { useRef, useState } from 'react';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -18,9 +18,9 @@ const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit 
         content: () => printRef.current,
     });
 
-    const handleQrCodeClick = async (baggageId: string) => {
+    const handleQrCodeClick = async (baggageId: number) => {
         try {
-            const url = await getQrCode(baggageId);
+            const url = await getQrCode(baggageId.toString());
             setQrCodeUrl(url);
             setIsDialogOpen(true);
         } catch (error) {
@@ -50,8 +50,8 @@ const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit 
                         <TableCell className="px-4 py-2">{baggage.tag}</TableCell>
                         <TableCell className="px-4 py-2">{baggage.color}</TableCell>
                         <TableCell className="px-4 py-2">{baggage.weight}kg</TableCell>
-                        <TableCell className="px-4 py-2">{baggage.status}</TableCell>
-                        <TableCell className="px-4 py-2">{baggage.lastSeenLocation}</TableCell>
+                        <TableCell className="px-4 py-2">{baggage.status.status}</TableCell>
+                        <TableCell className="px-4 py-2">{baggage.lastLocation}</TableCell>
                         <TableCell className="px-4 py-2 flex space-x-2">
                             {onEdit && (
                                 <Button onClick={() => onEdit(baggage)}>

@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { getActiveUsers, deleteUser, updateUser, registerUser, getUserByEmail } from "../../services/user-service/userService";
+import { deleteUser, updateUser, registerUser, getUserByEmail, getAllUsers } from "../../services/user-service/userService";
 import UserTable from "./components/user-table";
 import UserDetails from "./components/user-details";
 import UserCreateDetails from "./components/user-create-details";
@@ -27,7 +27,7 @@ export function UsersPage() {
     const fetchUsers = async () => {
         setLoading(true);
         try {
-            const data: UsersResponse = await getActiveUsers(currentPage, 10, "name");
+            const data: UsersResponse = await getAllUsers(currentPage, 10, "id");
             setUsers(data.content);
             setTotalPages(data.totalPages);
             setCurrentPage(data.number);
@@ -66,10 +66,9 @@ export function UsersPage() {
         }
     };
 
-
-    const handleDeleteUser = async (userId: string) => {
+    const handleDeleteUser = async (userId: number) => {
         try {
-            await deleteUser();
+            await deleteUser(userId);
             const updatedUsers = users.filter((user) => user.id !== userId);
             setUsers(updatedUsers);
             toast({
@@ -92,7 +91,7 @@ export function UsersPage() {
 
     const handleUpdateUser = async (updatedUser: User) => {
         try {
-            await updateUser(updatedUser);
+            await updateUser(updatedUser.id, updatedUser);
             const updatedUsers = users.map((user) =>
                 user.id === updatedUser.id ? updatedUser : user
             );
@@ -113,8 +112,7 @@ export function UsersPage() {
 
     const handleSearchByEmail = async (email: string) => {
         try {
-            const response = await getUserByEmail(email);
-            const user = response.data;
+            const user = await getUserByEmail(email);
             if (user) {
                 setSelectedUser(user);
                 setIsSearchByEmailOpen(false);
@@ -138,7 +136,6 @@ export function UsersPage() {
             });
         }
     };
-
 
     const handlePageChange = (newPage: number) => {
         setCurrentPage(newPage);

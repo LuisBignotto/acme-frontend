@@ -2,125 +2,186 @@ import { useState, FormEvent } from "react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import FormField from "../../../components/form-field/form-field";
+import SelectHour from "./select-hour";
+import SelectMinute from "./select-minute";
 import { FlightFormState } from "@/interfaces/flight-interfaces/FlightFormState";
 import { createFlight } from "@/services/flights-service/flightsService";
 import { toast } from "@/components/ui/use-toast";
 
 const fieldLabels: { [K in keyof Omit<FlightFormState, 'isValid'>]: string } = {
+    tag: "Tag do Voo",
     departureAirport: "Aeroporto de Partida",
     departureDate: "Data de Partida",
     departureTime: "Horário de Partida",
     arrivalAirport: "Aeroporto de Chegada",
     arrivalDate: "Data de Chegada",
     arrivalTime: "Horário de Chegada",
+    status: "Status do Voo",
+    airplaneModel: "Modelo do Avião",
 };
 
 export function CreateFlightForm({ onClose }: { onClose: () => void }) {
-
     const [state, setState] = useState<FlightFormState>({
+        tag: "",
         departureAirport: "",
         departureDate: "",
         departureTime: "",
         arrivalAirport: "",
         arrivalDate: "",
         arrivalTime: "",
+        status: "",
+        airplaneModel: "",
         isValid: true,
     });
-
 
     const handleChange = (field: keyof FlightFormState, value: string) => {
         setState({ ...state, [field]: value });
     };
 
     const handleTimeChange = (field: keyof FlightFormState, timePart: "hour" | "minute", value: string) => {
-        let currentTime = state[field] || "00:00";
-        currentTime = currentTime as string;
+        let currentTime = state[field] as string || "00:00";
         const [hour, minute] = currentTime.split(":");
         const newTime = timePart === "hour" ? `${value}:${minute}` : `${hour}:${value}`;
         handleChange(field, newTime);
     };
 
+    const generateFlightTag = (departureAirport: string, arrivalAirport: string): string => {
+        const randomNumbers = Math.floor(100 + Math.random() * 900).toString(); // Gera três números aleatórios
+        const departureCode = departureAirport.slice(0, 3).toUpperCase();
+        const arrivalCode = arrivalAirport.slice(0, 3).toUpperCase();
+        return `${departureCode}${randomNumbers}${arrivalCode}`;
+    };
 
     const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
         e.preventDefault();
-
         if (state.isValid) {
             const departureDateTime = `${state.departureDate}T${state.departureTime}:00`;
             const arrivalDateTime = `${state.arrivalDate}T${state.arrivalTime}:00`;
 
-            const departureAirportCode = state.departureAirport.substring(0, 3).toUpperCase();
-            const arrivalAirportCode = state.arrivalAirport.substring(0, 3).toUpperCase();
-            const randomNumber = Math.floor(Math.random() * 1000);
-            const flightNumber = `${departureAirportCode}${randomNumber}${arrivalAirportCode}`;
+            const flightTag = generateFlightTag(state.departureAirport, state.arrivalAirport);
 
             const flightData = {
-                flightNumber: flightNumber,
+                tag: flightTag,
                 departureDate: departureDateTime,
                 arrivalDate: arrivalDateTime,
                 departureAirport: state.departureAirport,
                 arrivalAirport: state.arrivalAirport,
+                status: state.status,
+                airplaneModel: state.airplaneModel,
             };
 
-            await createFlight(flightData)
-                .then(() => {
-                    toast({
-                        variant: "success",
-                        title: "Voo criado com sucesso!",
-                    })
-                    onClose();
-                })
-                .catch(() => {
-                    toast({
-                        variant: "destructive",
-                        title: "Erro ao criar voo!",
-                    })
-                    setState({ ...state, isValid: false });
+            try {
+                await createFlight(flightData);
+                toast({
+                    variant: "success",
+                    title: "Voo criado com sucesso!",
                 });
+                onClose();
+            } catch (error) {
+                toast({
+                    variant: "destructive",
+                    title: "Erro ao criar voo!",
+                });
+                setState({ ...state, isValid: false });
+            }
         }
     };
 
     return (
         <form onSubmit={handleSubmit}>
-            <div className="grid gap-4">
-                {(Object.keys(fieldLabels) as (keyof Omit<FlightFormState, 'isValid'>)[]).map((field) => (
-                    <div key={field} className="grid gap-2">
-                        <Label htmlFor={field}>{fieldLabels[field]}</Label>
-                        {field.includes("Time") ? (
-                            <div className="flex space-x-2">
-                                <FormField
-                                    field={`${field}Hour`}
-                                    value={state[field]?.split(":")[0] || ""}
-                                    onChange={(value) => handleTimeChange(field, "hour", value)}
-                                    type="hour"
-                                    placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                    placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                    placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
-                                />
-                                <FormField
-                                    field={`${field}Minute`}
-                                    value={state[field]?.split(":")[1] || ""}
-                                    onChange={(value) => handleTimeChange(field, "minute", value)}
-                                    type="minute"
-                                    placeholder={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                    placeholderHour={field.includes("departure") ? "Selecione a hora de partida" : "Selecione a hora de chegada"}
-                                    placeholderMinute={field.includes("departure") ? "Selecione o minuto de partida" : "Selecione o minuto de chegada"}
-                                />
-                            </div>
-                        ) : (
-                            <FormField
-                                field={field}
-                                value={state[field]}
-                                onChange={(value) => handleChange(field, value)}
-                                type={field === 'departureDate' || field === 'arrivalDate' ? 'date' : 'text'}
-                                placeholder={fieldLabels[field]}
-                                placeholderHour={""}
-                                placeholderMinute={""}
-                            />
-                        )}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid gap-2">
+                    <Label htmlFor="departureAirport">{fieldLabels.departureAirport}</Label>
+                    <FormField
+                        field="departureAirport"
+                        value={state.departureAirport}
+                        onChange={(value) => handleChange("departureAirport", value)}
+                        type="text"
+                        placeholder={fieldLabels.departureAirport}
+                    />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="departureTime">{fieldLabels.departureTime}</Label>
+                    <div className="flex space-x-2">
+                        <SelectHour
+                            value={state.departureTime.split(":")[0]}
+                            onChange={(value) => handleTimeChange("departureTime", "hour", value)}
+                            placeholder="Hora"
+                        />
+                        <SelectMinute
+                            value={state.departureTime.split(":")[1]}
+                            onChange={(value) => handleTimeChange("departureTime", "minute", value)}
+                            placeholder="Minuto"
+                        />
                     </div>
-                ))}
-                <Button type="submit" className="mt-4">Criar Voo</Button>
+                </div>
+                <div className="grid gap-2 col-span-2">
+                    <Label htmlFor="departureDate">{fieldLabels.departureDate}</Label>
+                    <FormField 
+                        field="departureDate"
+                        value={state.departureDate}
+                        onChange={(value) => handleChange("departureDate", value)}
+                        type="date"
+                        placeholder={fieldLabels.departureDate}
+                    />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="arrivalAirport">{fieldLabels.arrivalAirport}</Label>
+                    <FormField
+                        field="arrivalAirport"
+                        value={state.arrivalAirport}
+                        onChange={(value) => handleChange("arrivalAirport", value)}
+                        type="text"
+                        placeholder={fieldLabels.arrivalAirport}
+                    />
+                </div>
+                <div className="grid gap-2 col-span-2">
+                    <Label htmlFor="arrivalDate">{fieldLabels.arrivalDate}</Label>
+                    <FormField
+                        field="arrivalDate"
+                        value={state.arrivalDate}
+                        onChange={(value) => handleChange("arrivalDate", value)}
+                        type="date"
+                        placeholder={fieldLabels.arrivalDate}
+                    />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="arrivalTime">{fieldLabels.arrivalTime}</Label>
+                    <div className="flex space-x-2">
+                        <SelectHour
+                            value={state.arrivalTime.split(":")[0]}
+                            onChange={(value) => handleTimeChange("arrivalTime", "hour", value)}
+                            placeholder="Hora"
+                        />
+                        <SelectMinute
+                            value={state.arrivalTime.split(":")[1]}
+                            onChange={(value) => handleTimeChange("arrivalTime", "minute", value)}
+                            placeholder="Minuto"
+                        />
+                    </div>
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="status">{fieldLabels.status}</Label>
+                    <FormField
+                        field="status"
+                        value={state.status}
+                        onChange={(value) => handleChange("status", value)}
+                        type="text"
+                        placeholder={fieldLabels.status}
+                    />
+                </div>
+                <div className="grid gap-2">
+                    <Label htmlFor="airplaneModel">{fieldLabels.airplaneModel}</Label>
+                    <FormField
+                        field="airplaneModel"
+                        value={state.airplaneModel}
+                        onChange={(value) => handleChange("airplaneModel", value)}
+                        type="text"
+                        placeholder={fieldLabels.airplaneModel}
+                    />
+                </div>
             </div>
+            <Button type="submit" className="mt-4 w-full">Criar Voo</Button>
         </form>
     );
 }

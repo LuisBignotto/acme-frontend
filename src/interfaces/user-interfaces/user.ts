@@ -1,12 +1,13 @@
 import { Address } from "./address";
+import { Baggage } from "./baggage";
 
 export interface User {
-    id: string;
+    id: number;
     name: string;
     email: string;
     cpf: string;
-    password: string;
     phone: string | null;
-    role: string;
     address: Address | null;
+    roles: string[];
+    baggages: Baggage[];
 }

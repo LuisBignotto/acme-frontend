@@ -1,15 +1,21 @@
 import React, { useState } from 'react';
+import { useParams } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { BaggageFormState } from '@/interfaces/baggage-interfaces/BaggageFormState';
+import { getUserByEmail } from '@/services/user-service/userService';
+import { useToast } from '@/components/ui/use-toast';
 
 interface BaggageDetailsProps {
-    onSave: (newBaggage: BaggageFormState) => void;
+    onSave: (newBaggage: any) => void;
+    showFlightId?: boolean;
 }
 
-const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
+const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave, showFlightId = true }) => {
+    const { flightId } = useParams<{ flightId: string }>();
+    const { toast } = useToast();
     const [newBaggage, setNewBaggage] = useState<BaggageFormState>({
         userEmail: '',
         tag: '',
@@ -17,7 +23,7 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
         weight: '',
         status: '',
         lastSeenLocation: '',
-        flightId: '',
+        flightId: flightId || '',
         isValid: false,
     });
 
@@ -25,8 +31,37 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
         setNewBaggage({ ...newBaggage, [field]: value });
     };
 
-    const handleSave = () => {
-        onSave(newBaggage);
+    const generateTag = (): string => {
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+        let tag = '';
+        for (let i = 0; i < 6; i++) {
+            tag += characters.charAt(Math.floor(Math.random() * characters.length));
+        }
+        return tag;
+    };
+
+    const handleSave = async () => {
+        try {
+            const user = await getUserByEmail(newBaggage.userEmail);
+            const baggageData = {
+                userId: user.id,
+                tag: generateTag(),
+                color: newBaggage.color,
+                weight: parseFloat(newBaggage.weight),
+                statusId: parseInt(newBaggage.status, 10),
+                lastLocation: newBaggage.lastSeenLocation,
+                flightId: showFlightId ? parseInt(newBaggage.flightId, 10) : parseInt(flightId!, 10),
+                trackers: [],
+            };
+            console.log(baggageData);
+            onSave(baggageData);
+        } catch (error) {
+            toast({
+                variant: "destructive",
+                title: "Erro ao buscar usuário!",
+                description: "Ocorreu um erro ao buscar o usuário pelo email.",
+            });
+        }
     };
 
     return (
@@ -50,7 +85,7 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
                         <SelectValue placeholder="Selecione o status" />
                     </SelectTrigger>
                     <SelectContent>
-                        <SelectItem value="DESPACHADA">DESPACHADA</SelectItem>
+                        <SelectItem value="1">DESPACHADA</SelectItem>
                     </SelectContent>
                 </Select>
             </div>
@@ -58,10 +93,12 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave }) => {
                 <Label htmlFor="lastSeenLocation">Última Localização:</Label>
                 <Input id="lastSeenLocation" value={newBaggage.lastSeenLocation} onChange={(e) => handleChange('lastSeenLocation', e.target.value)} />
             </div>
-            <div className="col-span-2">
-                <Label htmlFor="flightId">Tag do Voo:</Label>
-                <Input id="flightId" value={newBaggage.flightId} onChange={(e) => handleChange('flightId', e.target.value)} />
-            </div>
+            {showFlightId && (
+                <div className="col-span-2">
+                    <Label htmlFor="flightId">ID do Voo:</Label>
+                    <Input id="flightId" value={newBaggage.flightId} onChange={(e) => handleChange('flightId', e.target.value)} />
+                </div>
+            )}
             <div className="flex space-x-1">
                 <Button onClick={handleSave}>Criar</Button>
             </div>

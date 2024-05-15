@@ -6,7 +6,7 @@ import { Pencil, Trash2 } from 'lucide-react';
 interface BaggageSearchResultsProps {
     baggages: Baggages[];
     onEdit: (baggage: Baggages) => void;
-    onDelete: (id: string) => void;
+    onDelete: (id: number) => void;
 }
 
 const BaggageSearchResults: React.FC<BaggageSearchResultsProps> = ({ baggages, onEdit, onDelete }) => {
