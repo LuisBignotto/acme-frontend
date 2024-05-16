@@ -93,10 +93,13 @@ export const deleteBaggage = async (baggageId: number) => {
     }
 };
 
-// Função para obter QR Code de uma bagagem (ajustar conforme necessário)
-export const getQrCode = async (baggageId: string): Promise<string> => {
+
+export const getQrCode = async (params: { id: string; userId: string; tag: string; color: string; weight: string; flightId: string }): Promise<string> => {
     try {
-        const response = await api.get(`/baggage-ms/qrcode?id=${baggageId}`, { responseType: 'blob' });
+        const response = await api.get(`/baggage-ms/baggages/generate`, {
+            params,
+            responseType: 'blob'
+        });
         return URL.createObjectURL(response.data);
     } catch (error) {
         throw error;
