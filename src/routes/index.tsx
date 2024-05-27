@@ -7,6 +7,7 @@ import { FlightPage } from '@/pages/flights/flight';
 import { BaggagesPage } from '@/pages/baggages/baggages';
 import { UsersPage } from '@/pages/users/users';
 import { UserProfile } from '@/pages/configuration/config';
+import { TicketsPage } from '@/pages/tickets/TicketsPage';
 
 const router = createBrowserRouter([
  {
@@ -36,6 +37,10 @@ const router = createBrowserRouter([
       {
         path: '/profile',
         element: <ProtectedRoute element={<UserProfile />} redirectTo="/" />
+      },
+      {
+        path: '/tickets',
+        element: <ProtectedRoute element={<TicketsPage />} redirectTo="/" />
       }
     ]
  }

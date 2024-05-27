@@ -23,6 +23,9 @@ const Header: React.FC<HeaderProps> = ({ userLoggedIn }) => {
           <NavLink to="../users">
             Usuários
           </NavLink>
+          <NavLink to="../tickets">
+            Tickets
+          </NavLink>
         </nav>
       ) : (<></>)
       }
