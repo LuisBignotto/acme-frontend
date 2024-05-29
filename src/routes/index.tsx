@@ -8,6 +8,7 @@ import { BaggagesPage } from '@/pages/baggages/baggages';
 import { UsersPage } from '@/pages/users/users';
 import { UserProfile } from '@/pages/configuration/config';
 import { TicketsPage } from '@/pages/tickets/TicketsPage';
+import { TicketDetailsPage } from '@/pages/tickets/TicketDetailsPage';
 
 const router = createBrowserRouter([
  {
@@ -41,6 +42,10 @@ const router = createBrowserRouter([
       {
         path: '/tickets',
         element: <ProtectedRoute element={<TicketsPage />} redirectTo="/" />
+      },
+      {
+        path: '/tickets/:ticketId',
+        element: <ProtectedRoute element={<TicketDetailsPage />} redirectTo="/" />
       }
     ]
  }

@@ -8,15 +8,15 @@ interface TicketDetailsProps {
 }
 
 const TicketDetails: React.FC<TicketDetailsProps> = ({ ticket, onSave, onDelete }) => {
-    const [updatedTicket, setUpdatedTicket] = useState<Ticket>(ticket);
+    const [updatedStatus, setUpdatedStatus] = useState<string>(ticket.status);
 
-    const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setUpdatedTicket({ ...updatedTicket, [e.target.name]: e.target.value });
+    const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        setUpdatedStatus(e.target.value);
     };
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        onSave(updatedTicket);
+        onSave({ ...ticket, status: updatedStatus });
     };
 
     return (
@@ -26,18 +26,18 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ ticket, onSave, onDelete 
                 <input
                     type="text"
                     name="title"
-                    value={updatedTicket.title}
-                    onChange={handleChange}
-                    className="border p-2 w-full"
+                    value={ticket.title}
+                    readOnly
+                    className="border p-2 w-full bg-gray-100"
                 />
             </div>
             <div className="mb-2">
                 <label className="block">Descrição</label>
                 <textarea
                     name="description"
-                    value={updatedTicket.description}
-                    onChange={handleChange}
-                    className="border p-2 w-full"
+                    value={ticket.description}
+                    readOnly
+                    className="border p-2 w-full bg-gray-100"
                 ></textarea>
             </div>
             <div className="mb-2">
@@ -45,7 +45,7 @@ const TicketDetails: React.FC<TicketDetailsProps> = ({ ticket, onSave, onDelete 
                 <input
                     type="text"
                     name="status"
-                    value={updatedTicket.status}
+                    value={updatedStatus}
                     onChange={handleChange}
                     className="border p-2 w-full"
                 />

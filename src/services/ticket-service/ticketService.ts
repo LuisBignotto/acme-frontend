@@ -1,4 +1,4 @@
-import { TicketCreate } from "@/interfaces/ticket-interfaces/ticket-interfaces";
+import { MessageCreate, TicketCreate } from "@/interfaces/ticket-interfaces/ticket-interfaces";
 import api from "../api";
 
 // Função para criar um novo ticket
@@ -31,7 +31,6 @@ export const getAllTickets = async (page = 0, size = 10, sort = 'id') => {
     }
 };
 
-
 // Função para buscar tickets por ID do usuário
 export const getTicketsByUserId = async (userId: number) => {
     try {
@@ -43,14 +42,15 @@ export const getTicketsByUserId = async (userId: number) => {
 };
 
 // Função para atualizar um ticket
-export const updateTicket = async (ticketId: number, ticketData: TicketCreate) => {
+export const updateTicket = async (ticketId: number, status: string) => {
     try {
-        const response = await api.put(`/ticket-ms/tickets/${ticketId}`, ticketData);
+        const response = await api.put(`/ticket-ms/tickets/${ticketId}`, { status });
         return response.data;
     } catch (error) {
         throw error;
     }
 };
+
 
 // Função para deletar um ticket
 export const deleteTicket = async (ticketId: number) => {
@@ -62,12 +62,9 @@ export const deleteTicket = async (ticketId: number) => {
 };
 
 // Função para adicionar uma mensagem a um ticket
-export const addMessageToTicket = async (ticketId: number, messageData: any) => {
+export const addMessageToTicket = async (ticketId: number, messageData: MessageCreate) => {
     try {
-        const response = await api.post(`/ticket-ms/messages`, {
-            ...messageData,
-            ticketId
-        });
+        const response = await api.post(`/ticket-ms/tickets/${ticketId}/messages`, messageData);
         return response.data;
     } catch (error) {
         throw error;
@@ -77,7 +74,7 @@ export const addMessageToTicket = async (ticketId: number, messageData: any) => 
 // Função para buscar mensagens de um ticket
 export const getMessagesByTicketId = async (ticketId: number) => {
     try {
-        const response = await api.get(`/ticket-ms/messages/ticket/${ticketId}`);
+        const response = await api.get(`/ticket-ms/tickets/${ticketId}/messages`);
         return response.data;
     } catch (error) {
         throw error;

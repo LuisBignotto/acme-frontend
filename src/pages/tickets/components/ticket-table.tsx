@@ -1,4 +1,5 @@
 import React from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
@@ -11,7 +12,13 @@ interface TicketTableProps {
     onEdit: (ticket: Ticket) => void;
 }
 
-const TicketTable: React.FC<TicketTableProps> = ({ tickets, onDelete, onEdit }) => {
+const TicketTable: React.FC<TicketTableProps> = ({ tickets = [], onDelete, onEdit }) => {
+    const navigate = useNavigate();
+
+    const handleOpenTicket = (ticketId: number) => {
+        navigate(`/tickets/${ticketId}`);
+    };
+
     return (
         <Table className="rounded-lg overflow-hidden min-w-screen-md shadow-lg">
             <TableHeader className="bg-gray-100">
@@ -31,7 +38,7 @@ const TicketTable: React.FC<TicketTableProps> = ({ tickets, onDelete, onEdit }) 
                         <TableCell className="px-4 py-2">{ticket.description}</TableCell>
                         <TableCell className="px-4 py-2">{ticket.status}</TableCell>
                         <TableCell className="px-4 py-2 flex space-x-2">
-                            <Button>
+                            <Button onClick={() => handleOpenTicket(ticket.id)}>
                                 Abrir
                             </Button>
                             <Button onClick={() => onEdit(ticket)}>

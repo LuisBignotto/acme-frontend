@@ -1,21 +1,18 @@
 import { useEffect, useState } from "react";
-import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { createTicket, getAllTickets, updateTicket, deleteTicket } from "../../services/ticket-sevice/ticketService";
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { getAllTickets, updateTicket, deleteTicket } from "../../services/ticket-service/ticketService";
 import TicketTable from "./components/ticket-table";
 import TicketDetails from "./components/ticket-details";
-import TicketCreateDetails from "./components/ticket-create-details";
 import PaginationComponent from "@/components/pagination/pagination-comp";
-import { TicketCreate, Ticket, TicketsResponse } from "@/interfaces/ticket-interfaces/ticket-interfaces";
+import { Ticket, TicketsResponse } from "@/interfaces/ticket-interfaces/ticket-interfaces";
 
 export function TicketsPage() {
     const [tickets, setTickets] = useState<Ticket[]>([]);
     const [loading, setLoading] = useState<boolean>(true);
     const [currentPage, setCurrentPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
-    const [isCreateOpen, setIsCreateOpen] = useState<boolean>(false);
     const [selectedTicket, setSelectedTicket] = useState<Ticket | null>(null);
     const [isTicketDetailsOpen, setIsTicketDetailsOpen] = useState<boolean>(false);
     const { toast } = useToast();
@@ -43,24 +40,6 @@ export function TicketsPage() {
         fetchTickets();
     }, [currentPage]);
 
-    const handleCreateTicket = async (newTicket: TicketCreate) => {
-        try {
-            await createTicket(newTicket);
-            toast({
-                variant: "success",
-                title: "Ticket criado com sucesso!",
-            });
-            fetchTickets();
-            setIsCreateOpen(false);
-        } catch (error) {
-            toast({
-                variant: "destructive",
-                title: "Erro ao criar ticket!",
-                description: "Não foi possível criar o ticket.",
-            });
-        }
-    };
-
     const handleDeleteTicket = async (ticketId: number) => {
         try {
             await deleteTicket(ticketId);
@@ -86,9 +65,9 @@ export function TicketsPage() {
 
     const handleUpdateTicket = async (updatedTicket: Ticket) => {
         try {
-            await updateTicket(updatedTicket.id, updatedTicket);
+            await updateTicket(updatedTicket.id, updatedTicket.status);
             const updatedTickets = tickets.map((ticket) =>
-                ticket.id === updatedTicket.id ? updatedTicket : ticket
+                ticket.id === updatedTicket.id ? { ...ticket, status: updatedTicket.status } : ticket
             );
             setTickets(updatedTickets);
             setIsTicketDetailsOpen(false);
@@ -120,17 +99,6 @@ export function TicketsPage() {
     return (
         <div className="flex-grow overflow-auto py-12 px-12">
             <div className="mb-4 flex space-x-1">
-                <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-                    <DialogTrigger asChild>
-                        <Button>Criar Ticket</Button>
-                    </DialogTrigger>
-                    <DialogContent>
-                        <DialogHeader>
-                            <DialogTitle>Criar Ticket</DialogTitle>
-                        </DialogHeader>
-                        <TicketCreateDetails onSave={handleCreateTicket} />
-                    </DialogContent>
-                </Dialog>
                 <Dialog open={isTicketDetailsOpen} onOpenChange={setIsTicketDetailsOpen}>
                     <DialogContent>
                         <DialogHeader>
@@ -161,3 +129,4 @@ export function TicketsPage() {
         </div>
     );
 }
+
