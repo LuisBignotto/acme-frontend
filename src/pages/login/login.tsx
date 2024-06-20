@@ -39,6 +39,12 @@ export function LoginForm() {
     if (state.isValid) {
       try {
         const data = await login(state.email, state.password);
+
+        if (data.role == 2 || data.role == 3) {
+          setState({ ...state, isValid: false });
+          return;
+        }
+
         saveSession({
           userId: data.id,
           tokenJwt: data.token,
