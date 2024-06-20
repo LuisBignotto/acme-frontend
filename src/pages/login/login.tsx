@@ -11,15 +11,17 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { login } from "@/services/authService";
 import { LoginFormState } from "@/interfaces/LoginFormState";
+import useSession from "@/hooks/useSession";
 
 export function LoginForm() {
+  const { saveSession } = useSession();
   const [state, setState] = useState<LoginFormState>({
     email: "",
     password: "",
     isValid: true,
   });
 
-  const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
@@ -35,14 +37,17 @@ export function LoginForm() {
     }
 
     if (state.isValid) {
-      login(state.email, state.password)
-        .then((data) => {
-          localStorage.setItem('authToken', data.token);
-          window.location.href = '/flights';
-        })
-        .catch((e) => {
-          setState({ ...state, isValid: false });
+      try {
+        const data = await login(state.email, state.password);
+        saveSession({
+          userId: data.id,
+          tokenJwt: data.token,
+          roleId: data.role,
         });
+        window.location.href = '/flights';
+      } catch (e) {
+        setState({ ...state, isValid: false });
+      }
     }
   };
 
