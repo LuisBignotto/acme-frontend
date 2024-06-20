@@ -28,7 +28,8 @@ export function UsersPage() {
         setLoading(true);
         try {
             const data: UsersResponse = await getAllUsers(currentPage, 10, "id");
-            setUsers(data.content);
+            console.log('fetchUsers data:', data); // Adicione este log
+            setUsers(data.content || []);
             setTotalPages(data.totalPages);
             setCurrentPage(data.number);
         } catch (error) {
@@ -38,6 +39,7 @@ export function UsersPage() {
                 title: "Falha ao buscar usuários!",
                 description: "Ocorreu um erro ao buscar os usuários.",
             });
+            setUsers([]); // Set an empty array in case of error
         } finally {
             setLoading(false);
         }
@@ -113,6 +115,7 @@ export function UsersPage() {
     const handleSearchByEmail = async (email: string) => {
         try {
             const user = await getUserByEmail(email);
+            console.log('handleSearchByEmail user:', user); // Adicione este log
             if (user) {
                 setSelectedUser(user);
                 setIsSearchByEmailOpen(false);
