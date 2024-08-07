@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { UserDetailsProps } from '@/interfaces/user-interfaces/user-details-props';
 import { User } from '@/interfaces/user-interfaces/user';
 import { Address } from '@/interfaces/user-interfaces/address';
-import { addRoleToUser, removeRoleFromUser } from '../../../services/user-service/userService';
+import { updateUserRole } from '../../../services/user-service/userService';
 
 const roles = [
     { value: "ROLE_ADMIN", label: "Administrador" },
@@ -33,19 +33,8 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onSave, onDelete }) => 
 
     const handleRoleChange = async (role: string) => {
         try {
-            if (updatedUser.roles.includes(role)) {
-                await removeRoleFromUser(updatedUser.id, role);
-                setUpdatedUser({
-                    ...updatedUser,
-                    roles: updatedUser.roles.filter(r => r !== role)
-                });
-            } else {
-                await addRoleToUser(updatedUser.id, role);
-                setUpdatedUser({
-                    ...updatedUser,
-                    roles: [...updatedUser.roles, role]
-                });
-            }
+            await updateUserRole(updatedUser.id, role);
+            setUpdatedUser({ ...updatedUser, role });
         } catch (error) {
             console.error("Erro ao modificar cargo do usuário:", error);
         }
@@ -78,21 +67,20 @@ const UserDetails: React.FC<UserDetailsProps> = ({ user, onSave, onDelete }) => 
                 <Input id="cpf" value={updatedUser.cpf || ''} onChange={(e) => handleChange('cpf', e.target.value)} disabled />
             </div>
             <div className="sm:col-span-2">
-                <Label>Funções:</Label>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                <Label htmlFor="role">Função:</Label>
+                <select
+                    id="role"
+                    value={updatedUser.role}
+                    onChange={(e) => handleRoleChange(e.target.value)}
+                    className="border p-2 rounded-md w-full"
+                >
+                    <option value="" disabled>Selecione uma função</option>
                     {roles.map((role) => (
-                        <div key={role.value}>
-                            <label className="flex items-center space-x-2">
-                                <input
-                                    type="checkbox"
-                                    checked={updatedUser.roles.includes(role.value)}
-                                    onChange={() => handleRoleChange(role.value)}
-                                />
-                                <span>{role.label}</span>
-                            </label>
-                        </div>
+                        <option key={role.value} value={role.value}>
+                            {role.label}
+                        </option>
                     ))}
-                </div>
+                </select>
             </div>
             <div className="sm:col-span-2">
                 <Label>Endereço:</Label>

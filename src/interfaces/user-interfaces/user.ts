@@ -8,6 +8,6 @@ export interface User {
     cpf: string;
     phone: string | null;
     address: Address | null;
-    roles: string[];
-    baggages: Baggage[];
+    role: string;
+    baggages?: Baggage[];
 }

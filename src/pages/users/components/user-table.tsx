@@ -19,7 +19,19 @@ const getRoleLabel = (role: string) => {
     }
 };
 
-const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
+const formatAddress = (address: any) => {
+    if (!address) return "-";
+    const { street, number, neighborhood, city, state, zipcode } = address;
+    return [
+        street,
+        number,
+        neighborhood,
+        city && state ? `${city} - ${state}` : city || state,
+        zipcode
+    ].filter(Boolean).join(', ');
+};
+
+const UserTable: React.FC<UserTableProps> = ({ users = [], onEdit, onDelete }) => {
     return (
         <Table>
             <TableHeader>
@@ -35,59 +47,57 @@ const UserTable: React.FC<UserTableProps> = ({ users, onEdit, onDelete }) => {
                 </TableRow>
             </TableHeader>
             <TableBody>
-                {users.map((user) => (
-                    <TableRow key={user.id}>
-                        <TableCell>{user.id}</TableCell>
-                        <TableCell>{user.name}</TableCell>
-                        <TableCell>{user.email}</TableCell>
-                        <TableCell>{user.cpf}</TableCell>
-                        <TableCell>{user.phone || "-"}</TableCell>
-                        <TableCell>
-                            {user.roles.map((role) => (
-                                <div key={role}>{getRoleLabel(role)}</div>
-                            ))}
-                        </TableCell>
-                        <TableCell>
-                            {user.address ? (
-                                <div>
-                                    {user.address.street}, {user.address.number}<br />
-                                    {user.address.neighborhood}, {user.address.city} - {user.address.state}<br />
-                                    {user.address.zipcode}
+                {users.length > 0 ? (
+                    users.map((user) => (
+                        <TableRow key={user.id}>
+                            <TableCell>{user.id}</TableCell>
+                            <TableCell>{user.name}</TableCell>
+                            <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.cpf}</TableCell>
+                            <TableCell>{user.phone || "-"}</TableCell>
+                            <TableCell>
+                                {user.role && (
+                                    <div>{getRoleLabel(user.role)}</div>
+                                )}
+                            </TableCell>
+                            <TableCell>
+                                {formatAddress(user.address)}
+                            </TableCell>
+                            <TableCell>
+                                <div className="flex space-x-2">
+                                    <Button
+                                        size="sm"
+                                        onClick={() => onEdit(user)}
+                                    >
+                                        <Pencil size={22} />
+                                    </Button>
+                                    <AlertDialog>
+                                        <AlertDialogTrigger asChild>
+                                            <Button
+                                                variant="destructive"
+                                                size="sm"
+                                            >
+                                                <Trash2 />
+                                            </Button>
+                                        </AlertDialogTrigger>
+                                        <AlertDialogContent>
+                                            <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
+                                            <AlertDialogDescription>Tem certeza de que deseja excluir este usuário?</AlertDialogDescription>
+                                            <AlertDialogFooter>
+                                                <AlertDialogCancel>Cancelar</AlertDialogCancel>
+                                                <AlertDialogAction onClick={() => onDelete(user.id)}>Confirmar</AlertDialogAction>
+                                            </AlertDialogFooter>
+                                        </AlertDialogContent>
+                                    </AlertDialog>
                                 </div>
-                            ) : (
-                                "-"
-                            )}
-                        </TableCell>
-                        <TableCell>
-                            <div className="flex space-x-2">
-                                <Button
-                                    size="sm"
-                                    onClick={() => onEdit(user)}
-                                >
-                                    <Pencil size={22} />
-                                </Button>
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button
-                                            variant="destructive"
-                                            size="sm"
-                                        >
-                                            <Trash2 />
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                                        <AlertDialogDescription>Tem certeza de que deseja excluir este usuário?</AlertDialogDescription>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => onDelete(user.id)}>Confirmar</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
-                        </TableCell>
+                            </TableCell>
+                        </TableRow>
+                    ))
+                ) : (
+                    <TableRow>
+                        <TableCell colSpan={8} className="text-center">Nenhum usuário encontrado.</TableCell>
                     </TableRow>
-                ))}
+                )}
             </TableBody>
         </Table>
     );

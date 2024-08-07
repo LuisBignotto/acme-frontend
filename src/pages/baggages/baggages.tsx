@@ -9,7 +9,6 @@ import { SearchBaggageByTag } from "./components/search-by-tag";
 import { SearchBaggageByEmail } from "./components/search-by-email";
 import { getAllBaggages, deleteBaggage, getBaggageByTag, getBaggagesByEmail, updateBaggage, createBaggage } from "../../services/baggage-service/baggageService";
 import BaggageDetails from "./components/baggage-details";
-import { getFlight, getFlightByTag } from "@/services/flights-service/flightsService";
 import BaggageCreateDetails from "./components/baggage-create";
 import { getUserByEmail } from "@/services/user-service/userService";
 import { BaggageFormState } from "@/interfaces/baggage-interfaces/BaggageFormState";
@@ -26,9 +25,9 @@ export function BaggagesPage() {
     const [isBaggageDetailsOpen, setIsBaggageDetailsOpen] = useState(false);
     const [foundBaggagesByEmail, setFoundBaggagesByEmail] = useState<Baggages[]>([]);
     const [isEditBaggageOpen, setIsEditBaggageOpen] = useState(false);
-    const [baggageToDelete, setBaggageToDelete] = useState<number | null>(null);
+    const [, setBaggageToDelete] = useState<number | null>(null);
     const [currentPage, setCurrentPage] = useState<number>(0);
-    const [totalPages, setTotalPages] = useState<number>(1);
+    const [totalPages] = useState<number>(1);
 
     const { toast } = useToast();
 
@@ -39,7 +38,6 @@ export function BaggagesPage() {
                 setBaggages(Array.isArray(data) ? data : []);
                 setLoading(false);
             } catch (error) {
-                console.error("Erro ao buscar bagagens:", error);
                 setLoading(false);
             }
         };
@@ -95,7 +93,6 @@ export function BaggagesPage() {
                 });
             }
         } catch (error) {
-            console.error("Erro ao criar bagagem:", error);
             toast({
                 variant: "destructive",
                 title: "Erro ao criar bagagem!",
@@ -117,7 +114,6 @@ export function BaggagesPage() {
                 title: "Bagagem apagada com sucesso!",
             });
         } catch (error) {
-            console.error("Erro ao excluir bagagem:", error);
             toast({
                 variant: "destructive",
                 title: "Erro ao excluir bagagem!",
@@ -177,7 +173,6 @@ export function BaggagesPage() {
                 title: "Erro ao buscar bagagens",
                 description: "Tente novamente mais tarde.",
             });
-            console.error(error);
         }
         setIsSearchByEmailOpen(false);
     };
@@ -191,15 +186,6 @@ export function BaggagesPage() {
 
     const handleUpdateBaggage = async (updatedBaggage: Baggages) => {
         try {
-            const flight = await getFlight(updatedBaggage.flightId.toString());
-            if (!flight) {
-                toast({
-                    variant: "destructive",
-                    title: "Erro ao atualizar bagagem",
-                    description: "Não há voos com o ID fornecido.",
-                });
-                return;
-            }
             await updateBaggage(updatedBaggage.id.toString(), updatedBaggage);
             const updatedBaggages = baggages.map(baggage => baggage.id === updatedBaggage.id ? updatedBaggage : baggage);
             setBaggages(updatedBaggages);
@@ -210,7 +196,6 @@ export function BaggagesPage() {
             });
 
         } catch (error) {
-            console.error("Erro ao atualizar bagagem:", error);
             toast({
                 variant: "destructive",
                 title: "Erro ao atualizar bagagem!",

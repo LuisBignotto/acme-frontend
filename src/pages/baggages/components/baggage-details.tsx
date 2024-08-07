@@ -94,7 +94,7 @@ const BaggageDetails: React.FC<BaggageDetailsProps> = ({ baggage, onSave, onDele
             </div>
             <div className="col-span-2">
                 <Label htmlFor="flightId">ID do Voo:</Label>
-                <Input id="flightId" value={updatedBaggage.flightId} onChange={(e) => handleChange('flightId', e.target.value)} />
+                <Input id="flightId" value={updatedBaggage.flightId} onChange={(e) => handleChange('flightId', e.target.value)} disabled />
             </div>
             <div className="flex space-x-1">
                 <Button onClick={handleSave}>Salvar</Button>

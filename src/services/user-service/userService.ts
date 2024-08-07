@@ -49,20 +49,10 @@ export const registerUser = async (userData: any) => {
     }
 };
 
-// Função para adicionar cargo a um usuário
-export const addRoleToUser = async (userId: number, role: string) => {
+// Função para atualizar cargo de um usuário
+export const updateUserRole = async (userId: number, role: string) => {
     try {
-        const response = await api.post(`/user-ms/users/${userId}/roles/${role}`);
-        return response.data;
-    } catch (error) {
-        throw error;
-    }
-};
-
-// Função para remover cargo de um usuário
-export const removeRoleFromUser = async (userId: number, role: string) => {
-    try {
-        const response = await api.delete(`/user-ms/users/${userId}/roles/${role}`);
+        const response = await api.post(`/user-ms/users/${userId}/role/${role}`);
         return response.data;
     } catch (error) {
         throw error;
