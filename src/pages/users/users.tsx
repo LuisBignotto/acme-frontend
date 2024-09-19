@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button";
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { deleteUser, updateUser, registerUser, getUserByEmail, getAllUsers } from "../../services/user-service/userService";
+import { deleteUser, updateUser, registerUser, getUserByEmail, getAllUsers, updateUserRole } from "../../services/user-service/userService";
 import UserTable from "./components/user-table";
 import UserDetails from "./components/user-details";
 import UserCreateDetails from "./components/user-create-details";
@@ -28,7 +28,6 @@ export function UsersPage() {
         setLoading(true);
         try {
             const data: UsersResponse = await getAllUsers(currentPage, 10, "id");
-            console.log('fetchUsers data:', data); // Adicione este log
             setUsers(data.content || []);
             setTotalPages(data.totalPages);
             setCurrentPage(data.number);
@@ -39,7 +38,7 @@ export function UsersPage() {
                 title: "Falha ao buscar usuários!",
                 description: "Ocorreu um erro ao buscar os usuários.",
             });
-            setUsers([]); // Set an empty array in case of error
+            setUsers([]);
         } finally {
             setLoading(false);
         }
@@ -51,12 +50,20 @@ export function UsersPage() {
 
     const handleCreateUser = async (newUser: UserRegister) => {
         const user = { ...newUser, active: true }
+
         try {
-            await registerUser(user);
+            const created_user = await registerUser(user);
+
+            if (newUser.roles && newUser.roles.length > 0 && !newUser.roles.includes("ROLE_USER")) {
+                const selectedRole = newUser.roles[0];
+                await updateUserRole(created_user.id, selectedRole);
+            }
+
             toast({
                 variant: "success",
                 title: "Usuário criado com sucesso!",
             });
+            
             fetchUsers();
             setIsCreateOpen(false);
         } catch (error) {
@@ -115,7 +122,6 @@ export function UsersPage() {
     const handleSearchByEmail = async (email: string) => {
         try {
             const user = await getUserByEmail(email);
-            console.log('handleSearchByEmail user:', user); // Adicione este log
             if (user) {
                 setSelectedUser(user);
                 setIsSearchByEmailOpen(false);

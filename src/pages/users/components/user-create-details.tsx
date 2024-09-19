@@ -27,11 +27,12 @@ const UserCreateDetails: React.FC<UserCreateDetailsProps> = ({ onSave }) => {
     };
 
     const handleRoleChange = (role: string) => {
-        setNewUser({
-            ...newUser,
-            roles: newUser.roles.includes(role)
-                ? newUser.roles.filter(r => r !== role)
-                : [...newUser.roles, role]
+        setNewUser((prevUser) => {
+            const roles = prevUser.roles.includes(role)
+                ? prevUser.roles.filter(r => r !== role)
+                : [...prevUser.roles, role]; 
+
+            return { ...prevUser, roles }; 
         });
     };
 
