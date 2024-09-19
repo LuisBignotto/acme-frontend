@@ -31,7 +31,7 @@ export const createFlight = async (flightData: FlightData) => {
 };
 
 // Função para atualizar um voo pelo ID
-export const updateFlight = async (flightId: string, flightData: any) => {
+export const updateFlight = async (flightId: string, flightData: FlightData) => {
     const response = await api.put(`/flight-ms/flights/${flightId}`, flightData);
     return response.data;
 };

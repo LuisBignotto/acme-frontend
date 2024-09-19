@@ -1,4 +1,6 @@
+import { User } from "@/interfaces/user-interfaces/user";
 import api from "../api";
+import { UserRegister } from "@/interfaces/user-interfaces/user-register";
 
 // Função para buscar usuário por email
 export const getUserByEmail = async (email: string) => {
@@ -13,7 +15,7 @@ export const getAllUsers = async (page = 0, size = 10, sort = 'id') => {
 };
 
 // Função para atualizar um usuário
-export const updateUser = async (userId: number, userData: any) => {
+export const updateUser = async (userId: number, userData: User) => {
     const response = await api.put(`/user-ms/users/${userId}`, userData);
     return response.data;
 };
@@ -24,7 +26,7 @@ export const deleteUser = async (userId: number) => {
 };
 
 // Função para registrar um usuário
-export const registerUser = async (userData: any) => {
+export const registerUser = async (userData: UserRegister) => {
     const response = await api.post("/user-ms/users/register", userData);
     return response.data;
 };
