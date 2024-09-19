@@ -12,7 +12,7 @@ const MessageList: React.FC<MessageListProps> = ({ messages, userId }) => {
             {messages.map((message) => (
                 <div
                     key={message.id}
-                    className={`mb-4 p-4 rounded-lg shadow-md max-w-lg ${message.senderId === userId ? "bg-blue-100 ml-auto" : "bg-gray-100 mr-auto"
+                    className={`mb-4 p-4 rounded-lg shadow-md max-w-lg ${message.senderId !== userId ? "bg-blue-100 ml-auto" : "bg-gray-100 mr-auto"
                         }`}
                 >
                     <div>{message.message}</div>

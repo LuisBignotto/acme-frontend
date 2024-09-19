@@ -2,8 +2,7 @@ import React from 'react';
 import { useNavigate } from 'react-router-dom';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
-import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogTitle, AlertDialogTrigger } from "@/components/ui/alert-dialog";
-import { Pencil, Trash2 } from 'lucide-react';
+import { Pencil } from 'lucide-react';
 import { Ticket } from "@/interfaces/ticket-interfaces/ticket-interfaces";
 
 interface TicketTableProps {
@@ -12,7 +11,7 @@ interface TicketTableProps {
     onEdit: (ticket: Ticket) => void;
 }
 
-const TicketTable: React.FC<TicketTableProps> = ({ tickets = [], onDelete, onEdit }) => {
+const TicketTable: React.FC<TicketTableProps> = ({ tickets = [], onEdit }) => {
     const navigate = useNavigate();
 
     const handleOpenTicket = (ticketId: number) => {
@@ -44,23 +43,6 @@ const TicketTable: React.FC<TicketTableProps> = ({ tickets = [], onDelete, onEdi
                             <Button onClick={() => onEdit(ticket)}>
                                 <Pencil size={22} />
                             </Button>
-                            <div>
-                                <AlertDialog>
-                                    <AlertDialogTrigger asChild>
-                                        <Button className="bg-red-700 hover:bg-red-600">
-                                            <Trash2 />
-                                        </Button>
-                                    </AlertDialogTrigger>
-                                    <AlertDialogContent>
-                                        <AlertDialogTitle>Confirmar Exclusão</AlertDialogTitle>
-                                        <AlertDialogDescription>Tem certeza de que deseja excluir este ticket?</AlertDialogDescription>
-                                        <AlertDialogFooter>
-                                            <AlertDialogCancel>Cancelar</AlertDialogCancel>
-                                            <AlertDialogAction onClick={() => onDelete(ticket.id)}>Confirmar</AlertDialogAction>
-                                        </AlertDialogFooter>
-                                    </AlertDialogContent>
-                                </AlertDialog>
-                            </div>
                         </TableCell>
                     </TableRow>
                 ))}

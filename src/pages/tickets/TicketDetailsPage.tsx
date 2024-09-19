@@ -37,12 +37,18 @@ export function TicketDetailsPage() {
 
     const handleAddMessage = async (messageContent: string) => {
         try {
+            const session = JSON.parse(localStorage.getItem("session") || "{}");
+            
+            const loggedUserId = session.userId;
+    
             const newMessage: MessageCreate = {
-                senderId: Number(ticket?.userId),
+                senderId: loggedUserId,
                 message: messageContent
             };
+    
             const addedMessage = await addMessageToTicket(Number(ticketId), newMessage);
             setMessages([...messages, addedMessage]);
+    
             toast({
                 variant: "success",
                 title: "Mensagem adicionada com sucesso!",
