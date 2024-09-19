@@ -39,14 +39,14 @@ export function CreateFlightForm({ onClose }: { onClose: () => void }) {
     };
 
     const handleTimeChange = (field: keyof FlightFormState, timePart: "hour" | "minute", value: string) => {
-        let currentTime = state[field] as string || "00:00";
+        const currentTime = state[field] as string || "00:00";
         const [hour, minute] = currentTime.split(":");
         const newTime = timePart === "hour" ? `${value}:${minute}` : `${hour}:${value}`;
         handleChange(field, newTime);
     };
 
     const generateFlightTag = (departureAirport: string, arrivalAirport: string): string => {
-        const randomNumbers = Math.floor(100 + Math.random() * 900).toString(); // Gera três números aleatórios
+        const randomNumbers = Math.floor(100 + Math.random() * 900).toString();
         const departureCode = departureAirport.slice(0, 3).toUpperCase();
         const arrivalCode = arrivalAirport.slice(0, 3).toUpperCase();
         return `${departureCode}${randomNumbers}${arrivalCode}`;

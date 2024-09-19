@@ -169,7 +169,12 @@ export function FlightsPage() {
                         <DialogHeader>
                             <DialogTitle>Criar Novo Voo</DialogTitle>
                         </DialogHeader>
-                        <CreateFlightForm onClose={() => dispatch({ type: 'SET_IS_OPEN', payload: false })} />
+                        <CreateFlightForm 
+                            onClose={() => {
+                                dispatch({ type: 'SET_IS_OPEN', payload: false });
+                                fetchFlights(); 
+                            }} 
+                        />
                     </DialogContent>
                 </Dialog>
                 <Dialog open={state.isSearchOpen} onOpenChange={(isSearchOpen) => dispatch({ type: 'SET_IS_SEARCH_OPEN', payload: isSearchOpen })}>
@@ -196,7 +201,13 @@ export function FlightsPage() {
                         <DialogTitle>Editar Voo</DialogTitle>
                     </DialogHeader>
                     {state.currentFlight && (
-                        <UpdateFlightForm flightId={state.currentFlight.id} onClose={() => dispatch({ type: 'SET_IS_EDIT_OPEN', payload: false })} />
+                        <UpdateFlightForm 
+                            flightId={state.currentFlight.id} 
+                            onClose={() => {
+                                dispatch({ type: 'SET_IS_EDIT_OPEN', payload: false });
+                                fetchFlights();
+                            }} 
+                        />
                     )}
                 </DialogContent>
             </Dialog>

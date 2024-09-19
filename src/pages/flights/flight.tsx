@@ -7,6 +7,7 @@ import { Baggages } from "@/interfaces/baggage-interfaces/Baggages";
 import BaggageTable from "../baggages/components/baggage-table";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogTrigger, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { User } from "@/interfaces/user-interfaces/user";
 import BaggageCreateDetails from "../baggages/components/baggage-create";
 
 export function FlightPage() {
@@ -39,7 +40,16 @@ export function FlightPage() {
         fetchBaggages();
     }, [flightId]);
 
-    const handleSaveBaggage = async (baggageData: any) => {
+    const handleSaveBaggage = async (baggageData: {
+        userId: number;
+        tag: string;
+        color: string;
+        weight: number;
+        statusId: number;
+        lastLocation: string;
+        flightId: number;
+        trackers: User[];
+    }) => {
         try {
             const newBaggage = await createBaggage(baggageData);
             toast({
