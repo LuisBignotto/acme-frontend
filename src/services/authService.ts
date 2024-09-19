@@ -28,10 +28,6 @@ api.interceptors.request.use(config => {
 });
 
 export const login = async (email: string, password: string) => {
-  try {
-    const response = await api.post('/user-ms/users/login', { email, password });
-    return response.data;
-  } catch (error) {
-    throw error;
-  }
+  const response = await api.post('/user-ms/users/login', { email, password });
+  return response.data;
 };
