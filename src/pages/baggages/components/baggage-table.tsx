@@ -5,11 +5,12 @@ import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, 
 import { BaggageTableProps } from '@/interfaces/baggage-interfaces/BaggageTableProps';
 import { Pencil, Trash2, QrCode } from 'lucide-react';
 import { getQrCode } from '@/services/baggage-service/baggageService';
+import { Baggages } from '@/interfaces/baggage-interfaces/Baggages';
 
 const BaggageTable: React.FC<BaggageTableProps> = ({ baggages, onDelete, onEdit }) => {
     const printRef = useRef<HTMLIFrameElement>(null);
 
-    const handleQrCodeClick = async (baggage: any) => {
+    const handleQrCodeClick = async (baggage: Baggages) => {
         try {
             const params = {
                 id: baggage.id,

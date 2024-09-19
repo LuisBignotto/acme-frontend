@@ -10,10 +10,9 @@ import { SearchBaggageByEmail } from "./components/search-by-email";
 import { getAllBaggages, deleteBaggage, getBaggageByTag, getBaggagesByEmail, updateBaggage, createBaggage } from "../../services/baggage-service/baggageService";
 import BaggageDetails from "./components/baggage-details";
 import BaggageCreateDetails from "./components/baggage-create";
-import { getUserByEmail } from "@/services/user-service/userService";
-import { BaggageFormState } from "@/interfaces/baggage-interfaces/BaggageFormState";
 import BaggageSearchResults from "./components/baggage-list";
 import PaginationComponent from "@/components/pagination/pagination-comp";
+import { User } from "@/interfaces/user-interfaces/user";
 
 export function BaggagesPage() {
     const [baggages, setBaggages] = useState<Baggages[]>([]);
@@ -54,33 +53,31 @@ export function BaggagesPage() {
         return tag;
     };
 
-    const handleCreateBaggage = async (newBaggage: BaggageFormState) => {
+    const handleCreateBaggage = async (newBaggage: {
+        userId: number;
+        tag: string;
+        color: string;
+        weight: number;
+        statusId: number;
+        lastLocation: string;
+        flightId: number;
+        trackers: User[];
+    }) => {
         try {
-            const userResponse = await getUserByEmail(newBaggage.userEmail);
-
-            if (!userResponse.data) {
-                toast({
-                    variant: "destructive",
-                    title: "Erro ao criar bagagem",
-                    description: "Usuário não encontrado com o e-mail fornecido.",
-                });
-                return;
-            }
-
-            const userId = userResponse.data.id;
 
             const tag = generateTag();
 
             const baggageData = {
-                userId: userId,
+                userId: newBaggage.userId,
                 tag: tag,
                 color: newBaggage.color,
-                weight: parseFloat(newBaggage.weight),
-                statusId: parseInt(newBaggage.status, 10),
-                lastLocation: newBaggage.lastSeenLocation,
-                flightId: parseInt(newBaggage.flightId, 10),
+                weight: newBaggage.weight,
+                statusId: newBaggage.statusId,
+                lastLocation: newBaggage.lastLocation,
+                flightId: newBaggage.flightId,
                 trackers: [],
             };
+
 
             const response = await createBaggage(baggageData);
 

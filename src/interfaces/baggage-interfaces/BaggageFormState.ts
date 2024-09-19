@@ -1,4 +1,5 @@
 export interface BaggageFormState {
+    userId?: number | string;
     userEmail: string;
     tag: string;
     color: string;

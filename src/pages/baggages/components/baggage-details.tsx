@@ -28,7 +28,7 @@ const statusOptions: Status[] = [
 const BaggageDetails: React.FC<BaggageDetailsProps> = ({ baggage, onSave, onDelete }) => {
     const [updatedBaggage, setUpdatedBaggage] = useState<Baggages>(baggage);
 
-    const handleChange = (field: keyof Baggages, value: any) => {
+    const handleChange = (field: keyof Baggages, value: string) => {
         setUpdatedBaggage({ ...updatedBaggage, [field]: value });
     };
 

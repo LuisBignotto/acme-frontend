@@ -7,9 +7,19 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { BaggageFormState } from '@/interfaces/baggage-interfaces/BaggageFormState';
 import { getUserByEmail } from '@/services/user-service/userService';
 import { useToast } from '@/components/ui/use-toast';
+import { User } from '@/interfaces/user-interfaces/user';
 
 interface BaggageDetailsProps {
-    onSave: (newBaggage: any) => void;
+    onSave: (newBaggage: {
+        userId: number;
+        tag: string;
+        color: string;
+        weight: number;
+        statusId: number;
+        lastLocation: string;
+        flightId: number;
+        trackers: User[];
+    }) => void;
     showFlightId?: boolean;
 }
 
@@ -42,6 +52,15 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave, showFligh
 
     const handleSave = async () => {
         try {
+            if (!newBaggage.color || !newBaggage.weight || !newBaggage.status || !newBaggage.lastSeenLocation) {
+                toast({
+                    variant: "destructive",
+                    title: "Erro: Todos os campos são obrigatórios.",
+                    description: "Por favor, preencha todos os campos.",
+                });
+                return;
+            }
+    
             const user = await getUserByEmail(newBaggage.userEmail);
             const baggageData = {
                 userId: user.id,
@@ -53,7 +72,7 @@ const BaggageCreateDetails: React.FC<BaggageDetailsProps> = ({ onSave, showFligh
                 flightId: showFlightId ? parseInt(newBaggage.flightId, 10) : parseInt(flightId!, 10),
                 trackers: [],
             };
-            console.log(baggageData);
+    
             onSave(baggageData);
         } catch (error) {
             toast({
