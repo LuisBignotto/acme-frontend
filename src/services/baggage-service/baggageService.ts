@@ -1,5 +1,7 @@
+import { Baggages } from "@/interfaces/baggage-interfaces/Baggages";
 import api from "../api";
 import { getUserByEmail } from "../user-service/userService";
+import { User } from "@/interfaces/user-interfaces/user";
 
 // Função para obter uma bagagem específica pelo ID
 export const getBaggage = async (baggageId: string) => {
@@ -39,13 +41,22 @@ export const getBaggagesByTracker = async (trackerId: string) => {
 };
 
 // Função para criar uma nova bagagem
-export const createBaggage = async (baggageData: any) => {
+export const createBaggage = async (baggageData: {
+    userId: number;
+    tag: string;
+    color: string;
+    weight: number;
+    statusId: number;
+    lastLocation: string;
+    flightId: number;
+    trackers: User[];
+}) => {
     const response = await api.post("/baggage-ms/baggages", baggageData);
     return response.data;
 };
 
 // Função para atualizar uma bagagem pelo ID
-export const updateBaggage = async (baggageId: string, baggageData: any) => {
+export const updateBaggage = async (baggageId: string, baggageData: Baggages) => {
     const response = await api.put(`/baggage-ms/baggages/${baggageId}`, baggageData);
     return response.data;
 };
@@ -56,7 +67,14 @@ export const deleteBaggage = async (baggageId: number) => {
 };
 
 // Função para obter QR Code de uma bagagem
-export const getQrCode = async (params: any): Promise<Blob> => {
+export const getQrCode = async (params: {
+    id: number,
+    userId: number,
+    tag: string,
+    color: string,
+    weight: number,
+    flightId: number,
+}): Promise<Blob> => {
     const response = await api.get(`/baggage-ms/baggages/generate`, {
         params,
         responseType: 'blob',
