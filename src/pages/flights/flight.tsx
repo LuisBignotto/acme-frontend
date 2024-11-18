@@ -1,8 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useParams } from 'react-router-dom';
 import { LoaderCircle } from "lucide-react";
 import { useToast } from "@/components/ui/use-toast";
-import { getBaggagesByFlight, createBaggage, deleteBaggage } from "@/services/baggage-service/baggageService";
+import { getBaggagesByFlight, createBaggage, deleteBaggage, countBaggage } from "@/services/baggage-service/baggageService";
 import { Baggages } from "@/interfaces/baggage-interfaces/Baggages";
 import BaggageTable from "../baggages/components/baggage-table";
 import { Button } from "@/components/ui/button";
@@ -14,6 +14,9 @@ export function FlightPage() {
     const [loading, setLoading] = useState<boolean>(true);
     const [baggages, setBaggages] = useState<Baggages[]>([]);
     const [isOpen, setIsOpen] = useState(false);
+    const [baggageCount, setBaggageCount] = useState<number>(0);
+    const [discrepancy, setDiscrepancy] = useState<boolean>(false); 
+    const intervalRef = useRef<NodeJS.Timeout | null>(null);
     const { flightId } = useParams<{ flightId: string }>();
     const { toast } = useToast();
 
@@ -36,9 +39,33 @@ export function FlightPage() {
         }
     };
 
+    const fetchBaggageCount = async () => {
+        if (!flightId) return;
+        const count = await countBaggage(flightId); 
+        setBaggageCount(count);
+    };
+
     useEffect(() => {
         fetchBaggages();
+        fetchBaggageCount();
+
+        if (!intervalRef.current) {
+            intervalRef.current = setInterval(() => {
+                fetchBaggageCount();
+            }, 3000);
+        }
+
+        return () => {
+            if (intervalRef.current) {
+                clearInterval(intervalRef.current);
+                intervalRef.current = null;
+            }
+        };
     }, [flightId]);
+
+    useEffect(() => {
+        setDiscrepancy(baggageCount > baggages.length);
+    }, [baggageCount, baggages.length]);
 
     const handleSaveBaggage = async (baggageData: {
         userId: number;
@@ -58,6 +85,7 @@ export function FlightPage() {
             });
             setBaggages([...baggages, newBaggage]);
             setIsOpen(false);
+            await fetchBaggageCount();
         } catch (error) {
             toast({
                 variant: "destructive",
@@ -74,6 +102,7 @@ export function FlightPage() {
                 variant: "success",
                 title: "Bagagem apagada com sucesso!",
             });
+            await fetchBaggageCount();
         } catch (error) {
             toast({
                 variant: "destructive",
@@ -109,7 +138,16 @@ export function FlightPage() {
                     </DialogContent>
                 </Dialog>
             </div>
+            {discrepancy && (
+                <div className="bg-red-100 text-red-800 p-4 mb-4 rounded-md">
+                    <strong>Atenção:</strong> A contagem de malas ({baggageCount}) é maior do que o número de bagagens registradas ({baggages.length}). Verifique possíveis erros.
+                </div>
+            )}
             <BaggageTable baggages={baggages} onDelete={handleDeleteBaggage} />
+            
+            <div className="mt-8 text-center">
+                <h2 className="text-xl font-bold">Total de malas contadas: {baggageCount}</h2>
+            </div>
         </div>
     );
 }

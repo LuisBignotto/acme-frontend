@@ -57,7 +57,9 @@ export const createBaggage = async (baggageData: {
 
 // Função para atualizar uma bagagem pelo ID
 export const updateBaggage = async (baggageId: string, baggageData: Baggages) => {
+    console.log(baggageData);
     const response = await api.put(`/baggage-ms/baggages/${baggageId}`, baggageData);
+    console.log(response.data);
     return response.data;
 };
 
@@ -80,4 +82,15 @@ export const getQrCode = async (params: {
         responseType: 'blob',
     });
     return response.data;
+};
+
+export const countBaggage = async (flightId: string) => {
+    try {
+        const response = await fetch(`http://192.168.15.102:80/count?flightId=${flightId}`);
+        const data = await response.json();
+        return data.count;
+    } catch (error) {
+        console.error('Erro ao buscar a contagem:', error);
+        return 0;
+    }
 };
